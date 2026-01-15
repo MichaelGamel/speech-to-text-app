@@ -3,6 +3,7 @@ import { useAudioRecorder } from "./hooks/useAudioRecorder";
 import { convertBlobToFloat32Array, float32ArrayToBuffer } from "./utils/audioConverter";
 import { TranscriptionProgress } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
+import { AudioPlayback } from "./components/AudioPlayback";
 
 function App() {
   // Global recording handler (Phase 6 - always active in background)
@@ -249,6 +250,7 @@ function App() {
                   Audio recorded ({(audioBlob.size / 1024).toFixed(1)} KB). Click "Transcribe" to convert to text.
                 </span>
               </div>
+              <AudioPlayback audioUrl={audioUrl} />
             </div>
           )}
 
