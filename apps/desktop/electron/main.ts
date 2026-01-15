@@ -615,6 +615,21 @@ ipcMain.handle("register-global-hotkey", async (_event, accelerator: string) => 
       throw new Error("Main window not available");
     }
 
+    // Check accessibility permission before registering hotkey (required on macOS)
+    const permissionManager = getPermissionManager();
+    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
+
+    if (accessibilityStatus !== "granted") {
+      console.warn(
+        "Cannot register global hotkey: accessibility permission not granted. " +
+        "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
+      );
+      return {
+        success: false,
+        error: "Accessibility permission not granted. Please enable it in System Preferences.",
+      };
+    }
+
     const hotkeyService = getGlobalHotkeyService(mainWindow);
     const success = hotkeyService.register(accelerator);
 
