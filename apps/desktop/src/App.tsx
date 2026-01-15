@@ -315,9 +315,13 @@ function App() {
               <div className="flex gap-3">
                 <button
                   onClick={handleCopy}
-                  className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
+                  className={`px-6 py-3 font-medium rounded-lg text-white transition-all duration-200 hover:-translate-y-px active:translate-y-0 ${
+                    copied
+                      ? "bg-green-600"
+                      : "bg-dark-800 hover:bg-dark-700"
+                  }`}
                 >
-                  Copy Transcript
+                  {copied ? "✓ Copied!" : "Copy Transcript"}
                 </button>
                 <button
                   onClick={handleSave}
