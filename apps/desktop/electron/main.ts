@@ -845,9 +845,21 @@ app.whenReady().then(async () => {
   // Initialize global hotkey service (Phase 3)
   if (mainWindow) {
     const hotkeyService = getGlobalHotkeyService(mainWindow);
-    const success = hotkeyService.register(settings.hotkey);
-    if (!success) {
-      console.warn("Failed to register default hotkey:", settings.hotkey);
+
+    // Check accessibility permission before registering hotkey (required on macOS)
+    const permissionManager = getPermissionManager();
+    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
+
+    if (accessibilityStatus !== "granted") {
+      console.warn(
+        "Skipping global hotkey registration: accessibility permission not granted. " +
+        "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
+      );
+    } else {
+      const success = hotkeyService.register(settings.hotkey);
+      if (!success) {
+        console.warn("Failed to register default hotkey:", settings.hotkey);
+      }
     }
 
     // Initialize streaming service (Phase 6)
