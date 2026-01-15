@@ -17,6 +17,7 @@ function App() {
   const {
     isRecording,
     audioBlob,
+    audioUrl,
     startRecording,
     stopRecording,
     error: recordingError,
