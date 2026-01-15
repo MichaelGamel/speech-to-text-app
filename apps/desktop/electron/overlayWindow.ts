@@ -8,6 +8,7 @@ export interface OverlayState {
   isRecording: boolean;
   transcriptPreview?: string;
   duration?: number;
+  audioLevel?: number; // 0-1 normalized audio level for waveform visualization
 }
 
 let overlayWindow: BrowserWindow | null = null;

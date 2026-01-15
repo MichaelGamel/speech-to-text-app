@@ -54,6 +54,7 @@ export interface OverlayState {
   isRecording: boolean;
   transcriptPreview?: string;
   duration?: number;
+  audioLevel?: number; // 0-1 normalized audio level for waveform visualization
 }
 
 // Streaming transcription (Phase 5)
