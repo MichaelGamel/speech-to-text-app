@@ -8,6 +8,7 @@ export interface GlobalSettings {
   preserveClipboard: boolean;
   showOverlay: boolean;
   overlayPosition: "top-right" | "top-left" | "bottom-right" | "bottom-left";
+  maxRecordingDuration: number; // Max recording duration in seconds (0 = no limit)
 }
 
 // Internal storage format (includes encrypted API key)
@@ -22,6 +23,7 @@ const defaults: StoredSettings = {
   preserveClipboard: true,
   showOverlay: true,
   overlayPosition: "top-right",
+  maxRecordingDuration: 300, // 5 minutes default, 0 = no limit
 };
 
 class SettingsStore {
