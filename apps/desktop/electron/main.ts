@@ -788,6 +788,20 @@ app.whenReady().then(async () => {
     console.warn("Microphone permission not granted. Speech recognition may not work.");
   }
 
+  // Request accessibility permission on macOS (required for global hotkeys and text injection)
+  if (isMac) {
+    const permissionManager = getPermissionManager();
+    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
+
+    if (accessibilityStatus !== "granted") {
+      // Request accessibility permission - this will show a system prompt
+      const accessibilityGranted = permissionManager.requestAccessibilityPermission();
+      if (!accessibilityGranted) {
+        console.warn("Accessibility permission not granted. Global hotkeys and text injection may not work.");
+      }
+    }
+  }
+
   // Configure session for Web Speech API
   const ses = session.defaultSession;
 
