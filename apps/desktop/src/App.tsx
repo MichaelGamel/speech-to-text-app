@@ -202,7 +202,7 @@ function App() {
             <button
               onClick={isRecording ? handleStopRecording : handleStartRecording}
               disabled={isTranscribing}
-              className={`px-6 py-3 font-medium rounded-lg text-white transition-all duration-200 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`px-6 py-3 font-medium rounded-lg text-white transition-all duration-200 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-blue-500 ${
                 isRecording
                   ? "bg-recording animate-pulse-recording"
                   : "bg-primary hover:bg-primary-hover"
