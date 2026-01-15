@@ -194,6 +194,16 @@ function App() {
 
       <main className="app-main max-w-4xl w-full mx-auto">
         <section className="bg-dark-900 rounded-xl p-6 mb-6">
+          {/* Visually hidden live region for announcing recording state changes */}
+          <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="sr-only"
+          >
+            {isRecording ? "Recording started" : audioBlob ? "Recording stopped" : ""}
+          </div>
+
           <div className="flex gap-4 mb-4 flex-wrap">
             <button
               onClick={handleSelectFile}
@@ -234,9 +244,17 @@ function App() {
           )}
 
           {isRecording && (
-            <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+            <div
+              className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg"
+              role="status"
+              aria-live="polite"
+            >
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse-recording"></div>
+                <div
+                  className="w-3 h-3 bg-red-500 rounded-full animate-pulse-recording"
+                  role="status"
+                  aria-label="Recording in progress"
+                ></div>
                 <span className="text-blue-400 font-medium">
                   Recording... Click "Stop Recording" when done
                 </span>
