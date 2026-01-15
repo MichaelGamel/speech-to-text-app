@@ -298,12 +298,19 @@ function App() {
           <section className="bg-dark-900 rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Transcription Result</h2>
-              <button
-                onClick={handleSave}
-                className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
-              >
-                Save Transcript
-              </button>
+              <div className="flex gap-3">
+                <button
+                  className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
+                >
+                  Copy Transcript
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
+                >
+                  Save Transcript
+                </button>
+              </div>
             </div>
             <textarea
               className="w-full min-h-[300px] p-4 font-inherit text-base leading-relaxed bg-dark-950 text-white border border-dark-800 rounded-lg resize-y outline-none focus:border-blue-600 transition-colors"
