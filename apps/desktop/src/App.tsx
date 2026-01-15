@@ -215,7 +215,7 @@ function App() {
               <button
                 onClick={handleTranscribe}
                 disabled={isTranscribing}
-                className="px-6 py-3 font-medium rounded-lg bg-green-600 text-white transition-all duration-200 hover:bg-green-700 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 font-medium rounded-lg bg-green-600 text-white transition-all duration-200 hover:bg-green-700 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-green-500"
               >
                 {isTranscribing ? "Transcribing..." : "Transcribe"}
               </button>
