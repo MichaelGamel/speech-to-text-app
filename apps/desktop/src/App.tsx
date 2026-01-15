@@ -139,6 +139,20 @@ function App() {
     }
   }, [audioBlob]);
 
+  const handleCopy = async () => {
+    if (!transcript) {
+      setError("No transcript to copy");
+      return;
+    }
+
+    const result = await window.electronAPI.copyToClipboard(transcript);
+    if (result.success) {
+      setCopied(true);
+    } else {
+      setError(`Failed to copy: ${result.error}`);
+    }
+  };
+
   const handleSave = async () => {
     if (!transcript) {
       setError("No transcript to save");
@@ -300,6 +314,7 @@ function App() {
               <h2 className="text-2xl font-semibold">Transcription Result</h2>
               <div className="flex gap-3">
                 <button
+                  onClick={handleCopy}
                   className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
                 >
                   Copy Transcript
