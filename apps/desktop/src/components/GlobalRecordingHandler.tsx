@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { StreamingResult } from "../types/electron";
+import { calculateRMSLevel, smoothAudioLevel } from "../utils/audioLevel";
 
 /**
  * Invisible component that handles global recording triggered by hotkeys
@@ -10,6 +11,7 @@ export const GlobalRecordingHandler = () => {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const currentTranscriptRef = useRef<string>("");
+  const audioLevelRef = useRef<number>(0);
 
   useEffect(() => {
     // Listen for global recording start
@@ -83,6 +85,14 @@ export const GlobalRecordingHandler = () => {
       processor.onaudioprocess = (e) => {
         const inputData = e.inputBuffer.getChannelData(0);
 
+        // Calculate audio level for visualization
+        const currentLevel = calculateRMSLevel(inputData);
+        audioLevelRef.current = smoothAudioLevel(
+          currentLevel,
+          audioLevelRef.current,
+          0.3
+        );
+
         // Send audio chunk to main process
         const buffer = new Float32Array(inputData);
         window.electronAPI.sendAudioChunk(buffer.buffer);
@@ -124,6 +134,9 @@ export const GlobalRecordingHandler = () => {
   };
 
   const cleanup = () => {
+    // Reset audio level
+    audioLevelRef.current = 0;
+
     // Stop audio processor
     if (processorRef.current) {
       processorRef.current.disconnect();
