@@ -178,7 +178,11 @@ function App() {
 
         {/* Global hotkey status indicator */}
         <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-900/20 border border-blue-500/30 rounded-full">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <div
+            className="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+            role="status"
+            aria-label="Global hotkey active"
+          ></div>
           <span className="text-sm text-blue-400 font-medium">
             Global Hotkey Active: <kbd className="px-2 py-1 bg-dark-800 rounded text-xs">Cmd+Shift+Space</kbd>
           </span>
