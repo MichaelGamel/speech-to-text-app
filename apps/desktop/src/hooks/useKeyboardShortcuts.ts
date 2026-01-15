@@ -39,7 +39,10 @@ const normalizeKey = (key: string): string => {
 
 /**
  * Checks if the currently focused element is an input field
- * where typing should not trigger shortcuts
+ * where typing should not trigger shortcuts.
+ *
+ * This prevents shortcuts like Space and Enter from interfering
+ * with normal text input in form fields.
  */
 const isInputFocused = (): boolean => {
   const activeElement = document.activeElement;
@@ -47,13 +50,19 @@ const isInputFocused = (): boolean => {
 
   const tagName = activeElement.tagName.toLowerCase();
 
-  // Check common input elements
+  // Check common input elements by tag name
   if (tagName === "input" || tagName === "textarea" || tagName === "select") {
     return true;
   }
 
   // Check for contenteditable elements
   if (activeElement.getAttribute("contenteditable") === "true") {
+    return true;
+  }
+
+  // Check for ARIA textbox/searchbox roles (accessibility support)
+  const role = activeElement.getAttribute("role");
+  if (role === "textbox" || role === "searchbox" || role === "combobox") {
     return true;
   }
 
