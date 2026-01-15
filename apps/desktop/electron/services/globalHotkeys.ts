@@ -1,5 +1,6 @@
 import { globalShortcut, BrowserWindow } from "electron";
 import { showOverlay, hideOverlay, updateOverlayState } from "../overlayWindow";
+import { getSettingsStore } from "./settingsStore";
 
 export class GlobalHotkeyService {
   private mainWindow: BrowserWindow;
@@ -160,6 +161,7 @@ export class GlobalHotkeyService {
 
   /**
    * Update the duration in the overlay
+   * Also checks if recording has exceeded maxRecordingDuration and auto-stops if so
    */
   private updateDuration(): void {
     if (!this.recordingStartTime) return;
@@ -169,6 +171,14 @@ export class GlobalHotkeyService {
       isRecording: true,
       duration: elapsed,
     });
+
+    // Check if recording should be auto-stopped due to duration limit
+    const maxDuration = getSettingsStore().get("maxRecordingDuration");
+    if (maxDuration > 0 && elapsed >= maxDuration) {
+      console.log(`Recording auto-stopped: reached ${maxDuration}s limit`);
+      this.isRecording = false;
+      this.stopRecording();
+    }
   }
 
   /**
