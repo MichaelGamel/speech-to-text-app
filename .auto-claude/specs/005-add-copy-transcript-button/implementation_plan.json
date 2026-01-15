@@ -1,0 +1,96 @@
+{
+  "feature": "Add Copy Transcript Button",
+  "description": "Add a button next to the Save Transcript button that copies the transcription text to clipboard with visual feedback",
+  "created_at": "2026-01-15T19:39:17.345Z",
+  "updated_at": "2026-01-15T19:50:00.000Z",
+  "status": "in_progress",
+  "planStatus": "approved",
+  "workflow_type": "development",
+  "services_involved": [
+    "apps/desktop"
+  ],
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Implementation",
+      "description": "Add the Copy Transcript button with click handler and visual feedback",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "1.1",
+          "title": "Add Copy Transcript button next to Save button",
+          "description": "Add a new button in the Transcription Result section header, positioned next to the existing Save Transcript button. Use the same button styling pattern (bg-dark-800, hover effects, etc.)",
+          "status": "failed",
+          "file": "apps/desktop/src/App.tsx",
+          "notes": "BLOCKER: Git worktree missing application code. Branch points to empty 'Initial commit' (577370a) with no files. Need to rebase branch onto a commit containing apps/desktop/src/App.tsx to proceed.",
+          "updated_at": "2026-01-15T19:43:30.116388+00:00"
+        },
+        {
+          "id": "1.2",
+          "title": "Add copied state management",
+          "description": "Add useState hook to track 'copied' state for visual feedback. State should auto-reset after 2 seconds.",
+          "status": "failed",
+          "file": "apps/desktop/src/App.tsx",
+          "notes": "BLOCKER: Same issue as 1.1 - Git worktree missing application code. Branch points to empty 'Initial commit' (577370a) with no files. apps/desktop/src/App.tsx does not exist.",
+          "updated_at": "2026-01-15T20:00:00.000Z"
+        },
+        {
+          "id": "1.3",
+          "title": "Implement handleCopy click handler",
+          "description": "Create async handleCopy function that: 1) Checks for transcript text, 2) Calls window.electronAPI.copyToClipboard(transcript), 3) Sets copied state to true on success, 4) Handles errors appropriately",
+          "status": "pending",
+          "file": "apps/desktop/src/App.tsx",
+          "notes": "Follow the same pattern as handleSave function"
+        },
+        {
+          "id": "1.4",
+          "title": "Add visual feedback for copied state",
+          "description": "Update button text to show 'Copied!' when copied state is true. Optionally add a checkmark icon or change button color briefly.",
+          "status": "pending",
+          "file": "apps/desktop/src/App.tsx",
+          "notes": "Could use conditional rendering: copied ? 'Copied!' : 'Copy Transcript'"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Testing & Verification",
+      "description": "Test the feature manually and verify it works correctly",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "2.1",
+          "title": "Build and verify no TypeScript errors",
+          "description": "Run pnpm build to verify the changes compile without errors",
+          "status": "pending",
+          "file": null,
+          "notes": "Run 'pnpm build' in apps/desktop directory"
+        },
+        {
+          "id": "2.2",
+          "title": "Manual testing verification",
+          "description": "Test the Copy button functionality: 1) Record audio and transcribe, 2) Click Copy button, 3) Verify 'Copied!' feedback appears, 4) Verify text is in clipboard, 5) Verify feedback resets after timeout",
+          "status": "pending",
+          "file": null,
+          "notes": "Verify the full user flow works as expected"
+        }
+      ]
+    }
+  ],
+  "final_acceptance": [
+    "Copy Transcript button appears next to Save Transcript button",
+    "Button has consistent styling with other buttons",
+    "Clicking button copies transcript text to clipboard",
+    "Visual feedback shows 'Copied!' temporarily after clicking",
+    "Feedback auto-resets after ~2 seconds",
+    "App builds without TypeScript errors"
+  ],
+  "spec_file": "spec.md",
+  "technical_notes": {
+    "existing_api": "window.electronAPI.copyToClipboard(text: string) - Already exposed via preload.ts at line 57",
+    "backend_implementation": "TextInjectionService.copyToClipboard() in electron/services/textInjection.ts uses Electron clipboard API",
+    "button_location": "apps/desktop/src/App.tsx - Transcription Result section, line ~194-202",
+    "button_pattern": "px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
+  },
+  "last_updated": "2026-01-15T19:43:30.116405+00:00"
+}

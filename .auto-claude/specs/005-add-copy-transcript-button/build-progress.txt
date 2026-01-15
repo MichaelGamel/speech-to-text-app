@@ -1,0 +1,70 @@
+# Build Progress - Add Copy Transcript Button
+
+## 2026-01-15 - Planning Phase
+
+### Codebase Analysis Complete
+- Located existing `copyToClipboard` API in electron types (line 118 in electron.d.ts)
+- Found implementation in TextInjectionService (electron/services/textInjection.ts)
+- Preload exposes API via `ipcRenderer.invoke("copy-to-clipboard", text)` (line 57)
+- Identified Save button location in App.tsx (line ~194-202)
+- Button styling pattern documented
+
+### Implementation Plan Created
+- Phase 1: Implementation (4 subtasks)
+  - 1.1: Add Copy Transcript button next to Save button
+  - 1.2: Add copied state management
+  - 1.3: Implement handleCopy click handler
+  - 1.4: Add visual feedback for copied state
+- Phase 2: Testing & Verification (2 subtasks)
+  - 2.1: Build and verify no TypeScript errors
+  - 2.2: Manual testing verification
+
+### Technical Notes
+- Existing API is fully functional - no backend changes needed
+- This is a frontend-only change to App.tsx
+- Follows existing patterns in the codebase
+
+### Status: BLOCKED - Missing Codebase
+
+## 2026-01-15 - Implementation Attempt (Subtask 1.1)
+
+### BLOCKER: Worktree Missing Application Code
+
+The git worktree was created from a branch (`auto-claude/005-add-copy-transcript-button`) that
+only contains an empty "Initial commit" with no files. Both `master` and the feature branch
+point to commit `577370a` which has no file content.
+
+**Current state:**
+- Worktree path: `/Users/michael/Work/AI/speech-to-text-app/.worktrees/005-add-copy-transcript-button`
+- Branch: `auto-claude/005-add-copy-transcript-button`
+- Tracked files: None (empty commit)
+- Only untracked files: `.auto-claude/`, `.auto-claude-status`, `.claude_settings.json`
+
+**Required to proceed:**
+1. The worktree needs to be populated with the actual speech-to-text-app codebase
+2. Specifically need: `apps/desktop/src/App.tsx`
+3. The branch should be based on a commit that contains the application code
+
+**Investigation done:**
+```
+$ git log --oneline -5
+577370a Initial commit
+
+$ git ls-tree -r HEAD --name-only
+(empty - no files)
+```
+
+### Status: BLOCKED - Waiting for codebase setup
+
+## 2026-01-15 - Implementation Attempt (Subtask 1.2)
+
+### Same Blocker: Worktree Still Missing Application Code
+
+Attempted subtask 1.2 (Add useState hook for copied state) but encountered the same blocker:
+- Git repository still at commit `577370a` (empty "Initial commit")
+- `apps/desktop/src/App.tsx` does not exist
+- Cannot add useState hook without the file to modify
+
+**Cannot proceed until the worktree is rebased onto a commit with actual application code.**
+
+### Status: BLOCKED - Same issue as 1.1

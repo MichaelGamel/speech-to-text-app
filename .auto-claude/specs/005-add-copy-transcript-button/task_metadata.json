@@ -1,0 +1,12 @@
+{
+  "sourceType": "ideation",
+  "ideationType": "code_improvements",
+  "ideaId": "ci-001",
+  "rationale": "The electronAPI already exposes copyToClipboard() function (line 118 in types/electron.d.ts). The UI already has the Save button pattern with consistent styling. This is a trivial addition using existing infrastructure.",
+  "category": "feature",
+  "estimatedEffort": "trivial",
+  "complexity": "trivial",
+  "affectedFiles": [
+    "apps/desktop/src/App.tsx"
+  ]
+}

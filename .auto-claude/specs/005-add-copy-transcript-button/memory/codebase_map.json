@@ -1,0 +1,15 @@
+{
+  "discovered_files": {
+    "apps/desktop/src/types/electron.d.ts": {
+      "description": "copyToClipboard API already exists at line 118 - fully implemented in TextInjectionService using Electron clipboard API",
+      "category": "api",
+      "discovered_at": "2026-01-15T19:41:40.813533+00:00"
+    },
+    "apps/desktop/src/App.tsx": {
+      "description": "Save Transcript button located in Transcription Result section around line 194-202. Uses consistent button styling pattern: px-6 py-3 font-medium rounded-lg bg-dark-800",
+      "category": "ui-pattern",
+      "discovered_at": "2026-01-15T19:41:40.833766+00:00"
+    }
+  },
+  "last_updated": "2026-01-15T19:41:40.833778+00:00"
+}
