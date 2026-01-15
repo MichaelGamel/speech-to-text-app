@@ -97,7 +97,11 @@ export const PermissionStatus = () => {
         <div className="flex items-center justify-between p-4 bg-dark-800 rounded-lg">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div className={`w-2 h-2 rounded-full ${getStatusColor(permissions.microphone)}`} />
+              <div
+                className={`w-2 h-2 rounded-full ${getStatusColor(permissions.microphone)}`}
+                role="status"
+                aria-label={`Microphone permission: ${getStatusText(permissions.microphone)}`}
+              />
               <div>
                 <p className="font-medium">Microphone Access</p>
                 <p className="text-sm text-gray-400">Required for audio recording</p>
@@ -123,6 +127,8 @@ export const PermissionStatus = () => {
             <div className="flex items-center gap-3">
               <div
                 className={`w-2 h-2 rounded-full ${getStatusColor(permissions.accessibility)}`}
+                role="status"
+                aria-label={`Accessibility permission: ${getStatusText(permissions.accessibility)}`}
               />
               <div>
                 <p className="font-medium">Accessibility Access</p>
