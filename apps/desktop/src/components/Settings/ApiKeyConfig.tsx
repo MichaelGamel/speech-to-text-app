@@ -81,7 +81,11 @@ export const ApiKeyConfig = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-dark-800 rounded-lg">
             <div className="flex items-center gap-3">
-              <div className={`w-2 h-2 rounded-full ${hasApiKey ? "bg-green-500" : "bg-gray-500"}`} />
+              <div
+                className={`w-2 h-2 rounded-full ${hasApiKey ? "bg-green-500" : "bg-gray-500"}`}
+                role="status"
+                aria-label={hasApiKey ? "API key configured" : "No API key configured"}
+              />
               <div>
                 <p className="font-medium">{hasApiKey ? "API Key Saved" : "No API Key"}</p>
                 <p className="text-sm text-gray-400">
