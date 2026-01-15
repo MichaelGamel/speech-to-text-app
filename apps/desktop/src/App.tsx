@@ -12,6 +12,7 @@ function App() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionProgress, setTranscriptionProgress] = useState<TranscriptionProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Audio recording hook
   const {
@@ -38,6 +39,16 @@ function App() {
       window.electronAPI.removeListener("transcription-progress");
     };
   }, []);
+
+  // Auto-reset copied state after 2 seconds
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
 
   // Combined error state
   const errorMessage = error || recordingError;
