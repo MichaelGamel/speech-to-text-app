@@ -70,7 +70,16 @@ const isInputFocused = (): boolean => {
 };
 
 /**
- * Checks if the main window has focus
+ * Checks if the main window has focus.
+ *
+ * This prevents shortcuts from triggering when the user is working
+ * in other applications. Uses document.hasFocus() which returns true
+ * only when the document's containing window is the active window.
+ *
+ * This is important because:
+ * - Electron apps can receive keyboard events even when not focused in some cases
+ * - We want shortcuts to only work when the user is actively using this app
+ * - Global hotkeys are handled separately by the Electron main process
  */
 const isWindowFocused = (): boolean => {
   return document.hasFocus();
