@@ -19,6 +19,14 @@ export default {
         },
         recording: '#ff3b30',
       },
+      ringOffsetColor: {
+        dark: {
+          950: '#1a1a1a',
+          900: '#2a2a2a',
+          800: '#3a3a3a',
+          700: '#4a4a4a',
+        },
+      },
       animation: {
         'pulse-recording': 'pulse-recording 1.5s ease-in-out infinite',
       },
