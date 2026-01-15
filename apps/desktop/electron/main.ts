@@ -624,6 +624,13 @@ ipcMain.handle("register-global-hotkey", async (_event, accelerator: string) => 
         "Cannot register global hotkey: accessibility permission not granted. " +
         "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
       );
+      // Notify renderer that hotkey registration failed due to missing permissions
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("hotkey-permission-required", {
+          permission: "accessibility",
+          reason: "Global hotkeys require accessibility permission on macOS",
+        });
+      }
       return {
         success: false,
         error: "Accessibility permission not granted. Please enable it in System Preferences.",
@@ -870,6 +877,13 @@ app.whenReady().then(async () => {
         "Skipping global hotkey registration: accessibility permission not granted. " +
         "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
       );
+      // Notify renderer that hotkey registration failed due to missing permissions
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("hotkey-permission-required", {
+          permission: "accessibility",
+          reason: "Global hotkeys require accessibility permission on macOS",
+        });
+      }
     } else {
       const success = hotkeyService.register(settings.hotkey);
       if (!success) {
