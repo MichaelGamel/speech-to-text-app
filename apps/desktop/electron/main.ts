@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import { existsSync } from "fs";
 import { transcribeAudio, initializeWhisper, TranscriptionProgress } from "./services/whisper";
 import { getSettingsStore, GlobalSettings } from "./services/settingsStore";
+import { getHistoryStore, TranscriptionEntry } from "./services/historyStore";
 import { getPermissionManager } from "./services/permissionManager";
 import {
   createOverlayWindow,
@@ -774,6 +775,79 @@ ipcMain.handle("send-audio-chunk", async (_event, audioData: ArrayBuffer) => {
     streamingService.sendAudio(float32Data);
   } catch (error) {
     console.error("Failed to send audio chunk:", error);
+  }
+});
+
+// ========================================
+// Transcription History (Phase 8)
+// ========================================
+
+ipcMain.handle("get-transcription-history", async () => {
+  try {
+    const historyStore = getHistoryStore();
+    const entries = historyStore.getAll();
+    return { success: true, data: entries };
+  } catch (error) {
+    console.error("Failed to get transcription history:", error);
+    return { success: false, error: (error as Error).message };
+  }
+});
+
+ipcMain.handle("add-transcription-history", async (_event, entry: Omit<TranscriptionEntry, "id" | "timestamp" | "characterCount">) => {
+  try {
+    if (typeof entry !== "object" || entry === null) {
+      throw new Error("Invalid entry object");
+    }
+
+    if (typeof entry.text !== "string" || entry.text.trim().length === 0) {
+      throw new Error("Invalid text");
+    }
+
+    if (typeof entry.duration !== "number" || entry.duration < 0) {
+      throw new Error("Invalid duration");
+    }
+
+    if (entry.source !== "recording" && entry.source !== "hotkey") {
+      throw new Error("Invalid source");
+    }
+
+    const historyStore = getHistoryStore();
+    const newEntry = historyStore.add(entry);
+    return { success: true, data: newEntry };
+  } catch (error) {
+    console.error("Failed to add transcription history:", error);
+    return { success: false, error: (error as Error).message };
+  }
+});
+
+ipcMain.handle("delete-transcription-history", async (_event, id: string) => {
+  try {
+    if (typeof id !== "string" || id.trim().length === 0) {
+      throw new Error("Invalid id");
+    }
+
+    const historyStore = getHistoryStore();
+    const deleted = historyStore.delete(id);
+
+    if (!deleted) {
+      return { success: false, error: "Entry not found" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete transcription history:", error);
+    return { success: false, error: (error as Error).message };
+  }
+});
+
+ipcMain.handle("clear-transcription-history", async () => {
+  try {
+    const historyStore = getHistoryStore();
+    historyStore.clear();
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to clear transcription history:", error);
+    return { success: false, error: (error as Error).message };
   }
 });
 
