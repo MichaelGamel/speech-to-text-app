@@ -206,7 +206,8 @@ const ClockIcon = ({ size, className }: { size: StatusSize; className?: string }
 );
 
 /**
- * Microphone icon - used for recording state
+ * Microphone icon with sound waves - used for recording state
+ * Sound waves provide additional visual cue that recording is active
  */
 const MicrophoneIcon = ({ size, className }: { size: StatusSize; className?: string }) => (
   <svg
@@ -219,10 +220,16 @@ const MicrophoneIcon = ({ size, className }: { size: StatusSize; className?: str
     strokeLinejoin="round"
     aria-hidden="true"
   >
-    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-    <line x1="12" y1="19" x2="12" y2="23" />
-    <line x1="8" y1="23" x2="16" y2="23" />
+    {/* Microphone body */}
+    <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+    {/* Microphone base arc */}
+    <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
+    {/* Stand */}
+    <line x1="12" y1="18" x2="12" y2="21" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    {/* Sound waves - right side */}
+    <path d="M20 7c1 1 1.5 2.5 1.5 4s-.5 3-1.5 4" opacity="0.6" />
+    <path d="M22 5c1.5 1.5 2 4 2 6s-.5 4.5-2 6" opacity="0.4" />
   </svg>
 );
 
