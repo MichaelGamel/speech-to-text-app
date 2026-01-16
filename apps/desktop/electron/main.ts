@@ -616,6 +616,28 @@ ipcMain.handle("register-global-hotkey", async (_event, accelerator: string) => 
       throw new Error("Main window not available");
     }
 
+    // Check accessibility permission before registering hotkey (required on macOS)
+    const permissionManager = getPermissionManager();
+    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
+
+    if (accessibilityStatus !== "granted") {
+      console.warn(
+        "Cannot register global hotkey: accessibility permission not granted. " +
+        "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
+      );
+      // Notify renderer that hotkey registration failed due to missing permissions
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("hotkey-permission-required", {
+          permission: "accessibility",
+          reason: "Global hotkeys require accessibility permission on macOS",
+        });
+      }
+      return {
+        success: false,
+        error: "Accessibility permission not granted. Please enable it in System Preferences.",
+      };
+    }
+
     const hotkeyService = getGlobalHotkeyService(mainWindow);
     const success = hotkeyService.register(accelerator);
 
@@ -862,6 +884,20 @@ app.whenReady().then(async () => {
     console.warn("Microphone permission not granted. Speech recognition may not work.");
   }
 
+  // Request accessibility permission on macOS (required for global hotkeys and text injection)
+  if (isMac) {
+    const permissionManager = getPermissionManager();
+    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
+
+    if (accessibilityStatus !== "granted") {
+      // Request accessibility permission - this will show a system prompt
+      const accessibilityGranted = permissionManager.requestAccessibilityPermission();
+      if (!accessibilityGranted) {
+        console.warn("Accessibility permission not granted. Global hotkeys and text injection may not work.");
+      }
+    }
+  }
+
   // Configure session for Web Speech API
   const ses = session.defaultSession;
 
@@ -905,9 +941,28 @@ app.whenReady().then(async () => {
   // Initialize global hotkey service (Phase 3)
   if (mainWindow) {
     const hotkeyService = getGlobalHotkeyService(mainWindow);
-    const success = hotkeyService.register(settings.hotkey);
-    if (!success) {
-      console.warn("Failed to register default hotkey:", settings.hotkey);
+
+    // Check accessibility permission before registering hotkey (required on macOS)
+    const permissionManager = getPermissionManager();
+    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
+
+    if (accessibilityStatus !== "granted") {
+      console.warn(
+        "Skipping global hotkey registration: accessibility permission not granted. " +
+        "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
+      );
+      // Notify renderer that hotkey registration failed due to missing permissions
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("hotkey-permission-required", {
+          permission: "accessibility",
+          reason: "Global hotkeys require accessibility permission on macOS",
+        });
+      }
+    } else {
+      const success = hotkeyService.register(settings.hotkey);
+      if (!success) {
+        console.warn("Failed to register default hotkey:", settings.hotkey);
+      }
     }
 
     // Initialize streaming service (Phase 6)

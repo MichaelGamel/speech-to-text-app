@@ -1,7 +1,42 @@
-import { globalShortcut, BrowserWindow } from "electron";
+import { globalShortcut, BrowserWindow, systemPreferences } from "electron";
 import { showOverlay, hideOverlay, updateOverlayState } from "../overlayWindow";
 
+const isMac = process.platform === "darwin";
+
 export class GlobalHotkeyService {
+  /**
+   * Check if accessibility permission is required on this platform
+   * Only macOS requires explicit accessibility permission for global hotkeys
+   */
+  static isAccessibilityRequired(): boolean {
+    return isMac;
+  }
+
+  /**
+   * Check if accessibility permission is currently granted
+   * Returns true on non-macOS platforms (where it's not required)
+   * On macOS, checks if the app is a trusted accessibility client
+   */
+  static checkAccessibilityPermission(): boolean {
+    if (!isMac) {
+      return true; // Not required on Windows/Linux
+    }
+
+    // Check without prompting the user
+    return systemPreferences.isTrustedAccessibilityClient(false);
+  }
+
+  /**
+   * Check if the service can register global hotkeys
+   * This is a convenience method that checks accessibility permission
+   */
+  static canRegisterHotkeys(): boolean {
+    if (!isMac) {
+      return true;
+    }
+    return GlobalHotkeyService.checkAccessibilityPermission();
+  }
+
   private mainWindow: BrowserWindow;
   private currentHotkey: string | null = null;
   private isRecording = false;
