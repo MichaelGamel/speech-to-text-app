@@ -39,6 +39,7 @@ export interface GlobalSettings {
   preserveClipboard: boolean;
   showOverlay: boolean;
   overlayPosition: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  maxRecordingDuration: number; // Max recording duration in seconds (0 = no limit)
 }
 
 // Permission status types

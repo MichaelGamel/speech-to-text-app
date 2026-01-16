@@ -488,6 +488,7 @@ ipcMain.handle("get-global-settings", async () => {
       preserveClipboard: true,
       showOverlay: true,
       overlayPosition: "top-right",
+      maxRecordingDuration: 300,
       hasApiKey: false,
     };
   }
