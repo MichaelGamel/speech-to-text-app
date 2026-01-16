@@ -132,13 +132,21 @@ export const HotkeyConfig = () => {
       </div>
 
       {error && (
-        <div className="mt-3 px-4 py-2 bg-red-900/20 border border-red-500/30 rounded-lg">
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="mt-3 px-4 py-2 bg-red-900/20 border border-red-500/30 rounded-lg"
+        >
           <p className="text-sm text-red-400">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="mt-3 px-4 py-2 bg-green-900/20 border border-green-500/30 rounded-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-3 px-4 py-2 bg-green-900/20 border border-green-500/30 rounded-lg"
+        >
           <p className="text-sm text-green-400">Hotkey updated successfully!</p>
         </div>
       )}
