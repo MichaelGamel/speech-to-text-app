@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AudioLevelIndicator } from "./AudioLevelIndicator";
 
 export interface OverlayState {
   isRecording: boolean;
@@ -41,6 +42,9 @@ export const OverlayIndicator = () => {
         {/* Glow effect */}
         <div className="absolute inset-0 w-3 h-3 bg-recording rounded-full animate-pulse opacity-50 blur-sm" />
       </div>
+
+      {/* Audio level visualization */}
+      <AudioLevelIndicator audioLevel={state.audioLevel ?? 0} />
 
       {/* Status text */}
       <div className="flex flex-col min-w-0">
