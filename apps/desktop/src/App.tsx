@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAudioRecorder } from "./hooks/useAudioRecorder";
+import { useKeyboardShortcuts, KeyboardShortcut } from "./hooks/useKeyboardShortcuts";
 import { convertBlobToFloat32Array, float32ArrayToBuffer } from "./utils/audioConverter";
 import { TranscriptionProgress } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
@@ -161,6 +162,34 @@ function App() {
         return "bg-blue-500";
     }
   };
+
+  // Toggle recording handler for keyboard shortcut
+  const toggleRecording = useCallback(() => {
+    if (isRecording) {
+      handleStopRecording();
+    } else if (!isTranscribing) {
+      handleStartRecording();
+    }
+  }, [isRecording, isTranscribing]);
+
+  // Keyboard shortcuts for in-app recording controls
+  // Space: Toggle recording, Enter: Transcribe
+  const keyboardShortcuts: KeyboardShortcut[] = useMemo(
+    () => [
+      {
+        key: "Space",
+        handler: toggleRecording,
+      },
+      {
+        key: "Enter",
+        handler: handleTranscribe,
+      },
+    ],
+    [toggleRecording, handleTranscribe]
+  );
+
+  // Enable keyboard shortcuts when window is focused
+  useKeyboardShortcuts(keyboardShortcuts);
 
   return (
     <div className="app min-h-screen flex flex-col pt-[60px] px-8 pb-8">
