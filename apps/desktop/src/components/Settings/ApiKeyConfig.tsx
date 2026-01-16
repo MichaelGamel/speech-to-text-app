@@ -102,7 +102,7 @@ export const ApiKeyConfig = () => {
                   </button>
                   <button
                     onClick={handleClear}
-                    className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-sm rounded transition-colors"
+                    className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-sm rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-red-400"
                   >
                     Remove
                   </button>
