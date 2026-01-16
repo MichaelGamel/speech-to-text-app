@@ -93,6 +93,9 @@ export const GlobalRecordingHandler = () => {
           0.3
         );
 
+        // Send audio level to main process for overlay visualization
+        window.electronAPI.sendAudioLevel(audioLevelRef.current);
+
         // Send audio chunk to main process
         const buffer = new Float32Array(inputData);
         window.electronAPI.sendAudioChunk(buffer.buffer);
@@ -134,8 +137,9 @@ export const GlobalRecordingHandler = () => {
   };
 
   const cleanup = () => {
-    // Reset audio level
+    // Reset audio level and notify overlay
     audioLevelRef.current = 0;
+    window.electronAPI.sendAudioLevel(0);
 
     // Stop audio processor
     if (processorRef.current) {
