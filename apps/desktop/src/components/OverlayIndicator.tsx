@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { StatusIndicator } from "./StatusIndicator";
 
 export interface OverlayState {
   isRecording: boolean;
@@ -34,12 +35,8 @@ export const OverlayIndicator = () => {
 
   return (
     <div className="flex items-center gap-3 px-5 py-3 bg-dark-900/95 rounded-full backdrop-blur-sm border border-dark-700 shadow-2xl">
-      {/* Pulsing recording dot */}
-      <div className="relative">
-        <div className="w-3 h-3 bg-recording rounded-full animate-pulse-recording" />
-        {/* Glow effect */}
-        <div className="absolute inset-0 w-3 h-3 bg-recording rounded-full animate-pulse opacity-50 blur-sm" />
-      </div>
+      {/* Recording indicator with icon for color-blind accessibility */}
+      <StatusIndicator status="recording" size="md" animate />
 
       {/* Status text */}
       <div className="flex flex-col min-w-0">
