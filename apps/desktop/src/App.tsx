@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAudioRecorder } from "./hooks/useAudioRecorder";
 import { convertBlobToFloat32Array, float32ArrayToBuffer } from "./utils/audioConverter";
-import { TranscriptionProgress } from "./types/electron";
+import { TranscriptionProgress, TranscriptionEntry } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
+import { TranscriptionHistoryList, TranscriptionDetailModal } from "./components/History";
+import { Toast } from "./components/Toast";
 
 function App() {
   // Global recording handler (Phase 6 - always active in background)
@@ -13,6 +15,15 @@ function App() {
   const [transcriptionProgress, setTranscriptionProgress] = useState<TranscriptionProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // History section state (local component state, not persisted)
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(true);
+  const [selectedHistoryEntry, setSelectedHistoryEntry] = useState<TranscriptionEntry | null>(null);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+
+  // Toast notification state
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   // Audio recording hook
   const {
@@ -49,6 +60,19 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [copied]);
+
+  // Listen for history updates from GlobalRecordingHandler (hotkey transcriptions)
+  useEffect(() => {
+    const handleHistoryUpdate = () => {
+      setHistoryRefreshKey((prev) => prev + 1);
+    };
+
+    window.addEventListener("transcription-history-updated", handleHistoryUpdate);
+
+    return () => {
+      window.removeEventListener("transcription-history-updated", handleHistoryUpdate);
+    };
+  }, []);
 
   // Combined error state
   const errorMessage = error || recordingError;
@@ -127,6 +151,20 @@ function App() {
           progress: 100,
           message: `Transcription complete in ${result.duration?.toFixed(2)}s`,
         });
+
+        // Save to transcription history
+        try {
+          await window.electronAPI.addTranscriptionHistory({
+            text: result.text,
+            duration: result.duration || 0,
+            source: "recording",
+          });
+          // Trigger history list refresh
+          setHistoryRefreshKey((prev) => prev + 1);
+        } catch (historyError) {
+          // Log error but don't fail the transcription
+          console.error("Failed to save to history:", historyError);
+        }
       } else {
         throw new Error(result.error || "Transcription failed");
       }
@@ -186,6 +224,40 @@ function App() {
         return "bg-blue-500";
     }
   };
+
+  // Toast helper function
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message);
+    setToastVisible(true);
+  }, []);
+
+  const hideToast = useCallback(() => {
+    setToastVisible(false);
+  }, []);
+
+  // History section handlers
+  const handleCopyHistoryItem = useCallback(async (entry: TranscriptionEntry) => {
+    try {
+      await navigator.clipboard.writeText(entry.text);
+      showToast("Copied to clipboard");
+    } catch (err) {
+      // Fallback to electron API if available
+      await window.electronAPI.copyToClipboard(entry.text);
+      showToast("Copied to clipboard");
+    }
+  }, [showToast]);
+
+  const handleViewHistoryItem = useCallback((entry: TranscriptionEntry) => {
+    setSelectedHistoryEntry(entry);
+  }, []);
+
+  const handleCloseHistoryModal = useCallback(() => {
+    setSelectedHistoryEntry(null);
+  }, []);
+
+  const toggleHistorySection = useCallback(() => {
+    setIsHistoryExpanded((prev) => !prev);
+  }, []);
 
   return (
     <div className="app min-h-screen flex flex-col pt-[60px] px-8 pb-8">
@@ -355,7 +427,46 @@ function App() {
             </div>
           </section>
         )}
+
+        {/* Recent Transcriptions Section - Collapsible */}
+        <section className="mt-6">
+          <button
+            onClick={toggleHistorySection}
+            className="w-full flex items-center justify-between px-6 py-4 bg-dark-900 rounded-t-xl hover:bg-dark-800 transition-colors"
+          >
+            <h2 className="text-2xl font-semibold">Recent Transcriptions</h2>
+            <span className={`text-2xl transition-transform ${isHistoryExpanded ? "rotate-180" : ""}`}>
+              ▼
+            </span>
+          </button>
+
+          {isHistoryExpanded && (
+            <div className="bg-dark-900 rounded-b-xl p-6 border-t border-dark-800">
+              <TranscriptionHistoryList
+                key={historyRefreshKey}
+                onCopy={handleCopyHistoryItem}
+                onView={handleViewHistoryItem}
+              />
+            </div>
+          )}
+        </section>
       </main>
+
+      {/* History Detail Modal */}
+      {selectedHistoryEntry && (
+        <TranscriptionDetailModal
+          entry={selectedHistoryEntry}
+          onClose={handleCloseHistoryModal}
+          onCopy={() => handleCopyHistoryItem(selectedHistoryEntry)}
+        />
+      )}
+
+      {/* Toast Notification */}
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={hideToast}
+      />
     </div>
   );
 }

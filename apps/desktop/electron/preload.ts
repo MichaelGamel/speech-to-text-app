@@ -63,6 +63,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
   stopStreamingTranscription: () => ipcRenderer.invoke("stop-streaming-transcription"),
   sendAudioChunk: (audioData: ArrayBuffer) => ipcRenderer.invoke("send-audio-chunk", audioData),
 
+  // Transcription History
+  getTranscriptionHistory: () => ipcRenderer.invoke("get-transcription-history"),
+  addTranscriptionHistory: (entry: { text: string; duration: number; source: "recording" | "hotkey" }) =>
+    ipcRenderer.invoke("add-transcription-history", entry),
+  deleteTranscriptionHistory: (id: string) => ipcRenderer.invoke("delete-transcription-history", id),
+  clearTranscriptionHistory: () => ipcRenderer.invoke("clear-transcription-history"),
+
   // Event listeners for streaming updates
   onGlobalRecordingStarted: (callback: () => void) => {
     const listener = () => callback();

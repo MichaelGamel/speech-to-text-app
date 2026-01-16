@@ -65,6 +65,19 @@ export interface StreamingResult {
 
 export type TranscriptionMode = 'deepgram' | 'whisper';
 
+// Transcription history entry
+export interface TranscriptionEntry {
+  id: string; // UUID
+  text: string;
+  timestamp: string; // ISO 8601 string
+  duration: number; // Duration in seconds
+  source: 'recording' | 'hotkey';
+  characterCount: number;
+}
+
+// Input type for adding new transcription entries (id, timestamp, characterCount auto-generated)
+export type TranscriptionEntryInput = Omit<TranscriptionEntry, 'id' | 'timestamp' | 'characterCount'>;
+
 export interface ElectronAPI {
   // Platform info
   platform: string;
@@ -122,6 +135,12 @@ export interface ElectronAPI {
   startStreamingTranscription: (apiKey?: string) => Promise<{ success: boolean; mode: TranscriptionMode; error?: string }>;
   stopStreamingTranscription: () => Promise<{ transcript: string }>;
   sendAudioChunk: (audioData: ArrayBuffer) => Promise<void>;
+
+  // Transcription History
+  getTranscriptionHistory: () => Promise<{ success: boolean; data?: TranscriptionEntry[]; error?: string }>;
+  addTranscriptionHistory: (entry: TranscriptionEntryInput) => Promise<{ success: boolean; data?: TranscriptionEntry; error?: string }>;
+  deleteTranscriptionHistory: (id: string) => Promise<{ success: boolean; error?: string }>;
+  clearTranscriptionHistory: () => Promise<{ success: boolean; error?: string }>;
 
   // Event listeners
   onGlobalRecordingStarted: (callback: () => void) => () => void;

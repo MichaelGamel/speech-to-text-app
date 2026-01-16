@@ -10,6 +10,7 @@ export const GlobalRecordingHandler = () => {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const currentTranscriptRef = useRef<string>("");
+  const recordingStartTimeRef = useRef<number>(0);
 
   useEffect(() => {
     // Listen for global recording start
@@ -49,10 +50,14 @@ export const GlobalRecordingHandler = () => {
 
   const startAudioCapture = async () => {
     try {
+      // Track recording start time for duration calculation
+      recordingStartTimeRef.current = Date.now();
+
       // Start streaming transcription in main process
       const result = await window.electronAPI.startStreamingTranscription();
       if (!result.success) {
         console.error("Failed to start streaming:", result.error);
+        recordingStartTimeRef.current = 0;
         return;
       }
 
@@ -100,6 +105,11 @@ export const GlobalRecordingHandler = () => {
 
   const stopAudioCapture = async () => {
     try {
+      // Calculate recording duration before cleanup
+      const recordingDuration = recordingStartTimeRef.current > 0
+        ? (Date.now() - recordingStartTimeRef.current) / 1000
+        : 0;
+
       // Cleanup audio resources
       cleanup();
 
@@ -114,10 +124,25 @@ export const GlobalRecordingHandler = () => {
         const settings = await window.electronAPI.getGlobalSettings();
         await window.electronAPI.injectText(finalTranscript, settings.preserveClipboard);
         console.log("Text injected successfully");
+
+        // Save to transcription history
+        try {
+          await window.electronAPI.addTranscriptionHistory({
+            text: finalTranscript,
+            duration: recordingDuration,
+            source: "hotkey",
+          });
+          // Dispatch custom event to notify App to refresh history list
+          window.dispatchEvent(new CustomEvent("transcription-history-updated"));
+        } catch (historyError) {
+          // Log error but don't fail the transcription flow
+          console.error("Failed to save to history:", historyError);
+        }
       }
 
-      // Reset transcript
+      // Reset state
       currentTranscriptRef.current = "";
+      recordingStartTimeRef.current = 0;
     } catch (error) {
       console.error("Failed to stop audio capture:", error);
     }
