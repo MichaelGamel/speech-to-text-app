@@ -96,7 +96,14 @@ export const HotkeyConfig = () => {
 
       <div className="flex items-center gap-4">
         <div
+          role="button"
           tabIndex={0}
+          aria-pressed={isRecording}
+          aria-label={
+            isRecording
+              ? "Press your desired hotkey combination. Press Escape to cancel."
+              : `Current hotkey: ${hotkey}. Click or press Enter to change.`
+          }
           onKeyDown={handleKeyDown}
           onClick={handleRecordHotkey}
           className={`flex-1 px-4 py-3 rounded-lg border-2 cursor-pointer transition-colors ${
