@@ -369,6 +369,21 @@ function App() {
               <p className="text-gray-500 text-sm mt-4">
                 First transcription will download the AI model (~150MB)
               </p>
+
+              {/* Keyboard shortcuts info */}
+              <div className="mt-6 pt-6 border-t border-dark-800">
+                <p className="text-sm text-gray-500 mb-3">Keyboard shortcuts (when app is focused):</p>
+                <div className="flex justify-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <kbd className="px-2 py-1 bg-dark-800 rounded text-xs text-gray-300 font-mono">Space</kbd>
+                    <span className="text-gray-400 text-sm">Start/Stop Recording</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <kbd className="px-2 py-1 bg-dark-800 rounded text-xs text-gray-300 font-mono">Enter</kbd>
+                    <span className="text-gray-400 text-sm">Transcribe</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         )}
