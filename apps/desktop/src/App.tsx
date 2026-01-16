@@ -274,12 +274,21 @@ function App() {
           )}
 
           {transcriptionProgress && (
-            <div className="mt-4 p-4 bg-dark-800 rounded-lg">
+            <div
+              className="mt-4 p-4 bg-dark-800 rounded-lg"
+              role="region"
+              aria-label="Transcription progress"
+            >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-300">
+                <span
+                  className="text-sm font-medium text-gray-300"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
                   {transcriptionProgress.message}
                 </span>
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-gray-400" aria-hidden="true">
                   {transcriptionProgress.progress}%
                 </span>
               </div>
@@ -287,6 +296,11 @@ function App() {
                 <div
                   className={`h-2 rounded-full transition-all duration-300 ${getProgressColor()}`}
                   style={{ width: `${transcriptionProgress.progress}%` }}
+                  role="progressbar"
+                  aria-valuenow={transcriptionProgress.progress}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Transcription progress: ${transcriptionProgress.progress}%`}
                 ></div>
               </div>
             </div>
