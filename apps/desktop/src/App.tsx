@@ -233,7 +233,7 @@ function App() {
           {isRecording && (
             <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse-recording"></div>
+                <StatusIndicator status="recording" size="md" />
                 <span className="text-blue-400 font-medium">
                   Recording... Click "Stop Recording" when done
                 </span>
