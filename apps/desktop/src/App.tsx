@@ -346,6 +346,7 @@ function App() {
               onChange={(e) => setTranscript(e.target.value)}
               placeholder="Transcription will appear here..."
               rows={15}
+              aria-label="Transcription result"
             />
           </section>
         )}
