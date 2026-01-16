@@ -307,9 +307,13 @@ function App() {
           )}
 
           {errorMessage && (
-            <div className="mt-4 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+            <div
+              className="mt-4 p-4 bg-red-900/20 border border-red-500/30 rounded-lg"
+              role="alert"
+              aria-live="assertive"
+            >
               <div className="flex items-start gap-3">
-                <span className="text-2xl">⚠️</span>
+                <span className="text-2xl" aria-hidden="true">⚠️</span>
                 <div className="flex-1">
                   <h3 className="text-red-400 font-semibold mb-1">Error</h3>
                   <p className="text-red-300 text-sm">{errorMessage}</p>
