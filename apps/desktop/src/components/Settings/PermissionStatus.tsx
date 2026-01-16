@@ -156,9 +156,13 @@ export const PermissionStatus = () => {
 
       {/* Warning if accessibility is not granted */}
       {permissions.accessibility !== "granted" && (
-        <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+        <div
+          className="mt-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg"
+          role="alert"
+          aria-live="assertive"
+        >
           <div className="flex gap-3">
-            <div className="text-yellow-500 text-xl">⚠️</div>
+            <div className="text-yellow-500 text-xl" aria-hidden="true">⚠️</div>
             <div>
               <p className="text-sm text-yellow-400 font-medium mb-1">
                 Accessibility Permission Required
@@ -185,9 +189,13 @@ export const PermissionStatus = () => {
 
       {/* Success state */}
       {permissions.microphone === "granted" && permissions.accessibility === "granted" && (
-        <div className="mt-4 p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
+        <div
+          className="mt-4 p-4 bg-green-900/20 border border-green-500/30 rounded-lg"
+          role="status"
+          aria-live="polite"
+        >
           <p className="text-sm text-green-400">
-            ✓ All permissions granted! Global speech-to-text is ready to use.
+            <span aria-hidden="true">✓ </span>All permissions granted! Global speech-to-text is ready to use.
           </p>
         </div>
       )}
