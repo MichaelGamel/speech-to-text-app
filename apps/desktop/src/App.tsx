@@ -295,7 +295,7 @@ function App() {
               </button>
             </div>
             <textarea
-              className="w-full min-h-[300px] p-4 font-inherit text-base leading-relaxed bg-dark-950 text-white border border-dark-800 rounded-lg resize-y outline-none focus:border-blue-600 transition-colors"
+              className="w-full min-h-[300px] p-4 font-inherit text-base leading-relaxed bg-dark-950 text-white border border-dark-800 rounded-lg resize-y focus-visible:outline-none focus:border-blue-600 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-blue-500 transition-colors"
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}
               placeholder="Transcription will appear here..."
