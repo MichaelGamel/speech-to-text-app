@@ -255,9 +255,21 @@ function App() {
           {transcriptionProgress && (
             <div className="mt-4 p-4 bg-dark-800 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-300">
-                  {transcriptionProgress.message}
-                </span>
+                <div className="flex items-center gap-2">
+                  <StatusIndicator
+                    status={
+                      transcriptionProgress.status === "loading" ? "pending" :
+                      transcriptionProgress.status === "transcribing" ? "processing" :
+                      transcriptionProgress.status === "completed" ? "success" :
+                      transcriptionProgress.status === "error" ? "error" :
+                      "processing"
+                    }
+                    size="sm"
+                  />
+                  <span className="text-sm font-medium text-gray-300">
+                    {transcriptionProgress.message}
+                  </span>
+                </div>
                 <span className="text-sm text-gray-400">
                   {transcriptionProgress.progress}%
                 </span>
