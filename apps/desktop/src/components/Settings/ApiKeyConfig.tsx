@@ -110,7 +110,7 @@ export const ApiKeyConfig = () => {
               ) : (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-3 py-1.5 bg-primary hover:bg-primary/80 text-white text-sm rounded transition-colors"
+                  className="px-3 py-1.5 bg-primary hover:bg-primary/80 text-white text-sm rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-blue-500"
                 >
                   Add API Key
                 </button>
