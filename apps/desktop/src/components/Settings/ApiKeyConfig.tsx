@@ -145,16 +145,19 @@ export const ApiKeyConfig = () => {
         // Edit mode
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">API Key</label>
+            <label htmlFor="api-key-input" className="block text-sm font-medium mb-2">API Key</label>
             <input
+              id="api-key-input"
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your Deepgram API key"
               className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors"
               autoFocus
+              aria-describedby="api-key-description"
+              aria-label="Deepgram API key (password field - characters are hidden)"
             />
-            <p className="text-xs text-gray-400 mt-2">
+            <p id="api-key-description" className="text-xs text-gray-400 mt-2">
               Your API key is stored securely and encrypted on your device.
             </p>
           </div>
