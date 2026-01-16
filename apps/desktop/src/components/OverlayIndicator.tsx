@@ -33,16 +33,25 @@ export const OverlayIndicator = () => {
   };
 
   return (
-    <div className="flex items-center gap-3 px-5 py-3 bg-dark-900/95 rounded-full backdrop-blur-sm border border-dark-700 shadow-2xl">
+    <div
+      className="flex items-center gap-3 px-5 py-3 bg-dark-900/95 rounded-full backdrop-blur-sm border border-dark-700 shadow-2xl"
+      role="status"
+      aria-live="polite"
+      aria-label="Recording overlay indicator"
+    >
       {/* Pulsing recording dot */}
       <div className="relative">
-        <div className="w-3 h-3 bg-recording rounded-full animate-pulse-recording" />
+        <div
+          className="w-3 h-3 bg-recording rounded-full animate-pulse-recording"
+          role="status"
+          aria-label="Recording in progress"
+        />
         {/* Glow effect */}
-        <div className="absolute inset-0 w-3 h-3 bg-recording rounded-full animate-pulse opacity-50 blur-sm" />
+        <div className="absolute inset-0 w-3 h-3 bg-recording rounded-full animate-pulse opacity-50 blur-sm" aria-hidden="true" />
       </div>
 
       {/* Status text */}
-      <div className="flex flex-col min-w-0">
+      <div className="flex flex-col min-w-0" aria-live="polite">
         <span className="text-sm text-white font-medium truncate">
           {state.transcriptPreview
             ? state.transcriptPreview.slice(-40) + (state.transcriptPreview.length > 40 ? "..." : "")
@@ -51,7 +60,9 @@ export const OverlayIndicator = () => {
 
         {/* Duration */}
         {state.duration !== undefined && (
-          <span className="text-xs text-gray-400">{formatDuration(state.duration)}</span>
+          <span className="text-xs text-gray-400" aria-label={`Recording duration: ${formatDuration(state.duration)}`}>
+            {formatDuration(state.duration)}
+          </span>
         )}
       </div>
     </div>
