@@ -256,7 +256,10 @@ function App() {
                   : "bg-primary hover:bg-primary-hover"
               }`}
             >
-              {isRecording ? "Stop Recording" : "Start Recording"}
+              <span className="inline-flex items-center gap-2">
+                {isRecording ? "Stop Recording" : "Start Recording"}
+                <kbd className="px-1.5 py-0.5 bg-black/30 rounded text-xs font-normal opacity-80">Space</kbd>
+              </span>
             </button>
 
             {audioBlob && !isRecording && (
@@ -265,7 +268,10 @@ function App() {
                 disabled={isTranscribing}
                 className="px-6 py-3 font-medium rounded-lg bg-green-600 text-white transition-all duration-200 hover:bg-green-700 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isTranscribing ? "Transcribing..." : "Transcribe"}
+                <span className="inline-flex items-center gap-2">
+                  {isTranscribing ? "Transcribing..." : "Transcribe"}
+                  {!isTranscribing && <kbd className="px-1.5 py-0.5 bg-black/30 rounded text-xs font-normal opacity-80">Enter</kbd>}
+                </span>
               </button>
             )}
           </div>
