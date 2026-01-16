@@ -121,6 +121,18 @@ function App() {
           progress: 100,
           message: `Transcription complete in ${result.duration?.toFixed(2)}s`,
         });
+
+        // Save to transcription history
+        try {
+          await window.electronAPI.addTranscriptionHistory({
+            text: result.text,
+            duration: result.duration || 0,
+            source: "recording",
+          });
+        } catch (historyError) {
+          // Log error but don't fail the transcription
+          console.error("Failed to save to history:", historyError);
+        }
       } else {
         throw new Error(result.error || "Transcription failed");
       }
