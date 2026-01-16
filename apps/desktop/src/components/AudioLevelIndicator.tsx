@@ -36,14 +36,16 @@ export const AudioLevelIndicator = ({
   // Calculate height for each bar based on audio level
   const getBarHeight = (multiplier: number): number => {
     // Apply non-linear scaling for better visual response
-    // Boost lower levels and compress higher levels
-    const scaledLevel = Math.pow(audioLevel, 0.6);
+    // Power 0.65 provides good balance: quiet sounds are visible but loud doesn't max out
+    const scaledLevel = Math.pow(audioLevel, 0.65);
 
-    // Minimum height when there's any audio, otherwise very small
-    const minHeight = audioLevel > 0.01 ? 0.2 : 0.15;
+    // Minimum height thresholds for visual distinction
+    // Active state: 25% min height for clear indication
+    // Idle state: 15% min height for subtle baseline
+    const minHeight = audioLevel > 0.02 ? 0.25 : 0.15;
     const maxHeight = 1;
 
-    // Calculate height with variation
+    // Calculate height with per-bar variation
     const height = minHeight + (maxHeight - minHeight) * scaledLevel * multiplier;
 
     return Math.min(maxHeight, Math.max(minHeight, height));
@@ -60,7 +62,8 @@ export const AudioLevelIndicator = ({
     >
       {barMultipliers.map((multiplier, index) => {
         const height = getBarHeight(multiplier);
-        const isActive = audioLevel > 0.02;
+        // Threshold for "active" coloring - slightly above noise floor
+        const isActive = audioLevel > 0.03;
 
         return (
           <div
@@ -71,7 +74,9 @@ export const AudioLevelIndicator = ({
             `}
             style={{
               height: `${height * 100}%`,
-              opacity: isActive ? 0.7 + height * 0.3 : 0.5,
+              // Higher base opacity (0.75) for better visibility
+              // Scale up to full opacity with height
+              opacity: isActive ? 0.75 + height * 0.25 : 0.5,
             }}
           />
         );

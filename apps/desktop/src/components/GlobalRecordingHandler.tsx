@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { StreamingResult } from "../types/electron";
-import { calculateRMSLevel, smoothAudioLevel } from "../utils/audioLevel";
+import { calculateRMSLevel, smoothAudioLevelAsymmetric } from "../utils/audioLevel";
 
 /**
  * Invisible component that handles global recording triggered by hotkeys
@@ -85,12 +85,15 @@ export const GlobalRecordingHandler = () => {
       processor.onaudioprocess = (e) => {
         const inputData = e.inputBuffer.getChannelData(0);
 
-        // Calculate audio level for visualization
+        // Calculate audio level for visualization with asymmetric smoothing
+        // Fast attack (0.15) responds quickly to louder sounds
+        // Slow decay (0.4) provides smooth fade-out for natural feel
         const currentLevel = calculateRMSLevel(inputData);
-        audioLevelRef.current = smoothAudioLevel(
+        audioLevelRef.current = smoothAudioLevelAsymmetric(
           currentLevel,
           audioLevelRef.current,
-          0.3
+          0.15,
+          0.4
         );
 
         // Send audio level to main process for overlay visualization
