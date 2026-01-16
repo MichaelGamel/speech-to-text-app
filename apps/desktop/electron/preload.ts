@@ -63,6 +63,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   stopStreamingTranscription: () => ipcRenderer.invoke("stop-streaming-transcription"),
   sendAudioChunk: (audioData: ArrayBuffer) => ipcRenderer.invoke("send-audio-chunk", audioData),
 
+  // Audio level for waveform visualization
+  sendAudioLevel: (level: number) => ipcRenderer.invoke("send-audio-level", level),
+
   // Event listeners for streaming updates
   onGlobalRecordingStarted: (callback: () => void) => {
     const listener = () => callback();

@@ -124,6 +124,9 @@ export interface ElectronAPI {
   stopStreamingTranscription: () => Promise<{ transcript: string }>;
   sendAudioChunk: (audioData: ArrayBuffer) => Promise<void>;
 
+  // Audio level for waveform visualization
+  sendAudioLevel: (level: number) => Promise<void>;
+
   // Event listeners
   onGlobalRecordingStarted: (callback: () => void) => () => void;
   onGlobalRecordingStopped: (callback: () => void) => () => void;
