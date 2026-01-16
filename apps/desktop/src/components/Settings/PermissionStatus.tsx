@@ -139,7 +139,7 @@ export const PermissionStatus = () => {
             {permissions.accessibility !== "granted" && (
               <button
                 onClick={handleRequestAccessibility}
-                className="px-3 py-1.5 bg-primary text-white text-sm rounded hover:bg-primary/80 transition-colors"
+                className="px-3 py-1.5 bg-primary text-white text-sm rounded hover:bg-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-blue-500"
               >
                 Grant Access
               </button>
