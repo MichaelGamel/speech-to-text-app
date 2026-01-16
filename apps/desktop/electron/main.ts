@@ -10,6 +10,7 @@ import {
   destroyOverlay,
   getOverlayWindow,
   positionOverlay,
+  updateOverlayState,
 } from "./overlayWindow";
 import {
   getGlobalHotkeyService,
@@ -774,6 +775,38 @@ ipcMain.handle("send-audio-chunk", async (_event, audioData: ArrayBuffer) => {
     streamingService.sendAudio(float32Data);
   } catch (error) {
     console.error("Failed to send audio chunk:", error);
+  }
+});
+
+// ========================================
+// Audio Level for Waveform Visualization
+// ========================================
+
+// Throttle audio level updates to ~60fps (16ms intervals)
+let lastAudioLevelUpdate = 0;
+const AUDIO_LEVEL_THROTTLE_MS = 16;
+
+ipcMain.handle("send-audio-level", async (_event, level: number) => {
+  try {
+    // Validate input
+    if (typeof level !== "number" || isNaN(level)) {
+      return;
+    }
+
+    // Clamp level to 0-1 range
+    const clampedLevel = Math.max(0, Math.min(1, level));
+
+    // Throttle updates to ~60fps
+    const now = Date.now();
+    if (now - lastAudioLevelUpdate < AUDIO_LEVEL_THROTTLE_MS) {
+      return;
+    }
+    lastAudioLevelUpdate = now;
+
+    // Forward audio level to overlay window
+    updateOverlayState({ isRecording: true, audioLevel: clampedLevel });
+  } catch (error) {
+    // Silently ignore errors to avoid flooding console during high-frequency updates
   }
 });
 
