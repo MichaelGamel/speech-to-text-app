@@ -160,7 +160,11 @@ export const ApiKeyConfig = () => {
           </div>
 
           {error && (
-            <div className="px-4 py-2 bg-red-900/20 border border-red-500/30 rounded-lg">
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="px-4 py-2 bg-red-900/20 border border-red-500/30 rounded-lg"
+            >
               <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
@@ -184,8 +188,15 @@ export const ApiKeyConfig = () => {
       )}
 
       {success && (
-        <div className="mt-4 px-4 py-2 bg-green-900/20 border border-green-500/30 rounded-lg">
-          <p className="text-sm text-green-400">✓ API key saved successfully!</p>
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-4 px-4 py-2 bg-green-900/20 border border-green-500/30 rounded-lg"
+        >
+          <p className="text-sm text-green-400">
+            <span aria-hidden="true">✓ </span>
+            API key saved successfully!
+          </p>
         </div>
       )}
     </div>
