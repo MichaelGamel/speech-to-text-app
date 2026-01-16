@@ -12,6 +12,7 @@ function App() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionProgress, setTranscriptionProgress] = useState<TranscriptionProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Audio recording hook
   const {
@@ -38,6 +39,16 @@ function App() {
       window.electronAPI.removeListener("transcription-progress");
     };
   }, []);
+
+  // Auto-reset copied state after 2 seconds
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
 
   // Combined error state
   const errorMessage = error || recordingError;
@@ -127,6 +138,20 @@ function App() {
       setIsTranscribing(false);
     }
   }, [audioBlob]);
+
+  const handleCopy = async () => {
+    if (!transcript) {
+      setError("No transcript to copy");
+      return;
+    }
+
+    const result = await window.electronAPI.copyToClipboard(transcript);
+    if (result.success) {
+      setCopied(true);
+    } else {
+      setError(`Failed to copy: ${result.error}`);
+    }
+  };
 
   const handleSave = async () => {
     if (!transcript) {
@@ -287,12 +312,24 @@ function App() {
           <section className="bg-dark-900 rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Transcription Result</h2>
-              <button
-                onClick={handleSave}
-                className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
-              >
-                Save Transcript
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCopy}
+                  className={`px-6 py-3 font-medium rounded-lg text-white transition-all duration-200 hover:-translate-y-px active:translate-y-0 ${
+                    copied
+                      ? "bg-green-600"
+                      : "bg-dark-800 hover:bg-dark-700"
+                  }`}
+                >
+                  {copied ? "✓ Copied!" : "Copy Transcript"}
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
+                >
+                  Save Transcript
+                </button>
+              </div>
             </div>
             <textarea
               className="w-full min-h-[300px] p-4 font-inherit text-base leading-relaxed bg-dark-950 text-white border border-dark-800 rounded-lg resize-y outline-none focus:border-blue-600 transition-colors"

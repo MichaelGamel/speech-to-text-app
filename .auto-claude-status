@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "005-add-copy-transcript-button",
+  "state": "building",
+  "subtasks": {
+    "completed": 4,
+    "total": 6,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Testing & Verification",
+    "id": null,
+    "total": 2
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 5,
+    "started_at": "2026-01-15T23:49:18.753790"
+  },
+  "last_update": "2026-01-15T23:55:49.573425"
+}
