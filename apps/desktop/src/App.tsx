@@ -208,6 +208,7 @@ function App() {
             <button
               onClick={handleSelectFile}
               disabled={isRecording || isTranscribing}
+              aria-label="Select an audio file to transcribe"
               className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Select Audio File
@@ -216,6 +217,8 @@ function App() {
             <button
               onClick={isRecording ? handleStopRecording : handleStartRecording}
               disabled={isTranscribing}
+              aria-pressed={isRecording}
+              aria-label={isRecording ? "Stop recording audio" : "Start recording audio"}
               className={`px-6 py-3 font-medium rounded-lg text-white transition-all duration-200 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
                 isRecording
                   ? "bg-recording animate-pulse-recording"
@@ -229,6 +232,8 @@ function App() {
               <button
                 onClick={handleTranscribe}
                 disabled={isTranscribing}
+                aria-busy={isTranscribing}
+                aria-label={isTranscribing ? "Transcription in progress, please wait" : "Transcribe recorded audio to text"}
                 className="px-6 py-3 font-medium rounded-lg bg-green-600 text-white transition-all duration-200 hover:bg-green-700 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isTranscribing ? "Transcribing..." : "Transcribe"}
@@ -329,6 +334,7 @@ function App() {
               <h2 className="text-2xl font-semibold">Transcription Result</h2>
               <button
                 onClick={handleSave}
+                aria-label="Save transcription result to a file"
                 className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
               >
                 Save Transcript
