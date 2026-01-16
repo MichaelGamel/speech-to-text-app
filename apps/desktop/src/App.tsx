@@ -3,6 +3,7 @@ import { useAudioRecorder } from "./hooks/useAudioRecorder";
 import { convertBlobToFloat32Array, float32ArrayToBuffer } from "./utils/audioConverter";
 import { TranscriptionProgress } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
+import { AlertModal } from "@speech-to-text/ui";
 
 function App() {
   // Global recording handler (Phase 6 - always active in background)
@@ -12,6 +13,10 @@ function App() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionProgress, setTranscriptionProgress] = useState<TranscriptionProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal states
+  const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
+  const [savedFilePath, setSavedFilePath] = useState<string>("");
 
   // Audio recording hook
   const {
@@ -136,7 +141,8 @@ function App() {
 
     const result = await window.electronAPI.saveTranscript(transcript);
     if (result.success) {
-      alert(`Transcript saved to:\n${result.filePath}`);
+      setSavedFilePath(result.filePath || "");
+      setShowSaveSuccessModal(true);
     } else {
       setError(`Failed to save: ${result.error}`);
     }
@@ -166,6 +172,15 @@ function App() {
     <div className="app min-h-screen flex flex-col pt-[60px] px-8 pb-8">
       {/* Global recording handler - always active, listens to hotkeys */}
       <GlobalRecordingHandler />
+
+      {/* Save success modal */}
+      <AlertModal
+        isOpen={showSaveSuccessModal}
+        onClose={() => setShowSaveSuccessModal(false)}
+        title="Transcript Saved"
+        message={`Transcript saved to:\n${savedFilePath}`}
+        type="success"
+      />
 
       <header className="app-header text-center mb-8">
         <h1 className="text-4xl font-semibold mb-2">Speech to Text</h1>
