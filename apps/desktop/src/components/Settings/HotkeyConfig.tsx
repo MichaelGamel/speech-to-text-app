@@ -117,7 +117,7 @@ export const HotkeyConfig = () => {
         {isRecording ? (
           <button
             onClick={handleCancel}
-            className="px-4 py-3 bg-dark-800 hover:bg-dark-700 rounded-lg text-white transition-colors"
+            className="px-4 py-3 bg-dark-800 hover:bg-dark-700 rounded-lg text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-gray-400"
           >
             Cancel
           </button>
