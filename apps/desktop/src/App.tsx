@@ -192,8 +192,8 @@ function App() {
         </p>
       </header>
 
-      <main className="app-main max-w-4xl w-full mx-auto">
-        <section className="bg-dark-900 rounded-xl p-6 mb-6">
+      <main className="app-main max-w-4xl w-full mx-auto" role="main" aria-label="Speech to text transcription">
+        <section className="bg-dark-900 rounded-xl p-6 mb-6" role="region" aria-label="Audio recording controls">
           {/* Visually hidden live region for announcing recording state changes */}
           <div
             role="status"
@@ -329,9 +329,9 @@ function App() {
         </section>
 
         {transcript && (
-          <section className="bg-dark-900 rounded-xl p-6">
+          <section className="bg-dark-900 rounded-xl p-6" role="region" aria-labelledby="transcription-result-heading">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold">Transcription Result</h2>
+              <h2 id="transcription-result-heading" className="text-2xl font-semibold">Transcription Result</h2>
               <button
                 onClick={handleSave}
                 aria-label="Save transcription result to a file"
@@ -352,10 +352,10 @@ function App() {
         )}
 
         {!transcript && !isRecording && !audioBlob && (
-          <section className="bg-dark-900 rounded-xl p-6 text-center">
+          <section className="bg-dark-900 rounded-xl p-6 text-center" role="region" aria-labelledby="ready-to-transcribe-heading">
             <div className="py-12">
-              <div className="text-6xl mb-4">🎤</div>
-              <h3 className="text-xl font-semibold mb-2">Ready to transcribe</h3>
+              <div className="text-6xl mb-4" aria-hidden="true">🎤</div>
+              <h3 id="ready-to-transcribe-heading" className="text-xl font-semibold mb-2">Ready to transcribe</h3>
               <p className="text-gray-400">
                 Click "Start Recording" to begin, then "Transcribe" to convert your speech to text
               </p>
