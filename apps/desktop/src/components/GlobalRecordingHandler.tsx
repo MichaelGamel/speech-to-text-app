@@ -132,6 +132,8 @@ export const GlobalRecordingHandler = () => {
             duration: recordingDuration,
             source: "hotkey",
           });
+          // Dispatch custom event to notify App to refresh history list
+          window.dispatchEvent(new CustomEvent("transcription-history-updated"));
         } catch (historyError) {
           // Log error but don't fail the transcription flow
           console.error("Failed to save to history:", historyError);

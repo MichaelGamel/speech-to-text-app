@@ -18,6 +18,7 @@ function App() {
   // History section state (local component state, not persisted)
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(true);
   const [selectedHistoryEntry, setSelectedHistoryEntry] = useState<TranscriptionEntry | null>(null);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // Toast notification state
   const [toastVisible, setToastVisible] = useState(false);
@@ -46,6 +47,19 @@ function App() {
 
     return () => {
       window.electronAPI.removeListener("transcription-progress");
+    };
+  }, []);
+
+  // Listen for history updates from GlobalRecordingHandler (hotkey transcriptions)
+  useEffect(() => {
+    const handleHistoryUpdate = () => {
+      setHistoryRefreshKey((prev) => prev + 1);
+    };
+
+    window.addEventListener("transcription-history-updated", handleHistoryUpdate);
+
+    return () => {
+      window.removeEventListener("transcription-history-updated", handleHistoryUpdate);
     };
   }, []);
 
@@ -134,6 +148,8 @@ function App() {
             duration: result.duration || 0,
             source: "recording",
           });
+          // Trigger history list refresh
+          setHistoryRefreshKey((prev) => prev + 1);
         } catch (historyError) {
           // Log error but don't fail the transcription
           console.error("Failed to save to history:", historyError);
@@ -402,6 +418,7 @@ function App() {
           {isHistoryExpanded && (
             <div className="mt-2">
               <TranscriptionHistoryList
+                key={historyRefreshKey}
                 onCopy={handleCopyHistoryItem}
                 onViewFull={handleViewHistoryItem}
               />
