@@ -21,9 +21,9 @@ export function createOverlayWindow(): BrowserWindow {
   const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize;
 
   overlayWindow = new BrowserWindow({
-    width: 350,
+    width: 380,
     height: 70,
-    x: screenWidth - 370, // 20px padding from right edge
+    x: screenWidth - 400, // 20px padding from right edge
     y: 20, // 20px padding from top
     frame: false,
     transparent: true,
