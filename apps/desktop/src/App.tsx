@@ -4,6 +4,7 @@ import { convertBlobToFloat32Array, float32ArrayToBuffer } from "./utils/audioCo
 import { TranscriptionProgress, TranscriptionEntry } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
 import { TranscriptionHistoryList, TranscriptionDetailModal } from "./components/History";
+import { Toast } from "./components/Toast";
 
 function App() {
   // Global recording handler (Phase 6 - always active in background)
@@ -17,6 +18,10 @@ function App() {
   // History section state (local component state, not persisted)
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(true);
   const [selectedHistoryEntry, setSelectedHistoryEntry] = useState<TranscriptionEntry | null>(null);
+
+  // Toast notification state
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   // Audio recording hook
   const {
@@ -179,15 +184,27 @@ function App() {
     }
   };
 
+  // Toast helper function
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message);
+    setToastVisible(true);
+  }, []);
+
+  const hideToast = useCallback(() => {
+    setToastVisible(false);
+  }, []);
+
   // History section handlers
   const handleCopyHistoryItem = useCallback(async (entry: TranscriptionEntry) => {
     try {
       await navigator.clipboard.writeText(entry.text);
+      showToast("Copied to clipboard");
     } catch (err) {
       // Fallback to electron API if available
       await window.electronAPI.copyToClipboard(entry.text);
+      showToast("Copied to clipboard");
     }
-  }, []);
+  }, [showToast]);
 
   const handleViewHistoryItem = useCallback((entry: TranscriptionEntry) => {
     setSelectedHistoryEntry(entry);
@@ -401,6 +418,14 @@ function App() {
           onClose={handleCloseHistoryModal}
         />
       )}
+
+      {/* Toast Notification */}
+      <Toast
+        message={toastMessage}
+        isVisible={toastVisible}
+        onDismiss={hideToast}
+        duration={2000}
+      />
     </div>
   );
 }
