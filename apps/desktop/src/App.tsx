@@ -164,16 +164,35 @@ function App() {
   };
 
   // Toggle recording handler for keyboard shortcut
+  // Only allows toggling when not transcribing (to prevent conflicts)
   const toggleRecording = useCallback(() => {
     if (isRecording) {
       handleStopRecording();
     } else if (!isTranscribing) {
       handleStartRecording();
     }
+    // If isTranscribing is true, do nothing - user must wait for transcription to complete
   }, [isRecording, isTranscribing]);
 
+  // State-aware transcribe handler for keyboard shortcut
+  // Only triggers when conditions are met (has audio, not recording, not already transcribing)
+  const handleTranscribeShortcut = useCallback(() => {
+    // Don't transcribe if currently recording - user should stop recording first
+    if (isRecording) return;
+
+    // Don't transcribe if already transcribing
+    if (isTranscribing) return;
+
+    // Don't transcribe if no audio blob exists
+    if (!audioBlob) return;
+
+    // All conditions met, proceed with transcription
+    handleTranscribe();
+  }, [isRecording, isTranscribing, audioBlob, handleTranscribe]);
+
   // Keyboard shortcuts for in-app recording controls
-  // Space: Toggle recording, Enter: Transcribe
+  // Space: Toggle recording (when not transcribing)
+  // Enter: Transcribe (when audio exists and not recording/transcribing)
   const keyboardShortcuts: KeyboardShortcut[] = useMemo(
     () => [
       {
@@ -182,10 +201,10 @@ function App() {
       },
       {
         key: "Enter",
-        handler: handleTranscribe,
+        handler: handleTranscribeShortcut,
       },
     ],
-    [toggleRecording, handleTranscribe]
+    [toggleRecording, handleTranscribeShortcut]
   );
 
   // Enable keyboard shortcuts when window is focused
