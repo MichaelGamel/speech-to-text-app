@@ -289,7 +289,7 @@ function App() {
               <h2 className="text-2xl font-semibold">Transcription Result</h2>
               <button
                 onClick={handleSave}
-                className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0"
+                className="px-6 py-3 font-medium rounded-lg bg-dark-800 text-white transition-all duration-200 hover:bg-dark-700 hover:-translate-y-px active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-gray-400"
               >
                 Save Transcript
               </button>
