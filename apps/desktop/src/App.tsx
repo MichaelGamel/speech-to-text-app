@@ -3,6 +3,7 @@ import { useAudioRecorder } from "./hooks/useAudioRecorder";
 import { convertBlobToFloat32Array, float32ArrayToBuffer } from "./utils/audioConverter";
 import { TranscriptionProgress } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
+import { StatusIndicator } from "./components/StatusIndicator";
 
 function App() {
   // Global recording handler (Phase 6 - always active in background)
@@ -178,7 +179,7 @@ function App() {
 
         {/* Global hotkey status indicator */}
         <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-900/20 border border-blue-500/30 rounded-full">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <StatusIndicator status="active" size="sm" />
           <span className="text-sm text-blue-400 font-medium">
             Global Hotkey Active: <kbd className="px-2 py-1 bg-dark-800 rounded text-xs">Cmd+Shift+Space</kbd>
           </span>
