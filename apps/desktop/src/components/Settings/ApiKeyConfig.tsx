@@ -129,7 +129,7 @@ export const ApiKeyConfig = () => {
                 href="https://deepgram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-blue-500"
               >
                 deepgram.com
               </a>{" "}
