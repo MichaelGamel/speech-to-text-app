@@ -124,7 +124,7 @@ export const HotkeyConfig = () => {
         ) : (
           <button
             onClick={handleRecordHotkey}
-            className="px-4 py-3 bg-primary hover:bg-primary/80 rounded-lg text-white transition-colors"
+            className="px-4 py-3 bg-primary hover:bg-primary/80 rounded-lg text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-blue-500"
           >
             Change
           </button>
