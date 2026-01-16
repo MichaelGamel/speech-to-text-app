@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAudioRecorder } from "./hooks/useAudioRecorder";
 import { convertBlobToFloat32Array, float32ArrayToBuffer } from "./utils/audioConverter";
-import { TranscriptionProgress } from "./types/electron";
+import { TranscriptionProgress, TranscriptionEntry } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
+import { TranscriptionHistoryList, TranscriptionDetailModal } from "./components/History";
 
 function App() {
   // Global recording handler (Phase 6 - always active in background)
@@ -12,6 +13,10 @@ function App() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionProgress, setTranscriptionProgress] = useState<TranscriptionProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // History section state (local component state, not persisted)
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(true);
+  const [selectedHistoryEntry, setSelectedHistoryEntry] = useState<TranscriptionEntry | null>(null);
 
   // Audio recording hook
   const {
@@ -161,6 +166,28 @@ function App() {
         return "bg-blue-500";
     }
   };
+
+  // History section handlers
+  const handleCopyHistoryItem = useCallback(async (entry: TranscriptionEntry) => {
+    try {
+      await navigator.clipboard.writeText(entry.text);
+    } catch (err) {
+      // Fallback to electron API if available
+      await window.electronAPI.copyToClipboard(entry.text);
+    }
+  }, []);
+
+  const handleViewHistoryItem = useCallback((entry: TranscriptionEntry) => {
+    setSelectedHistoryEntry(entry);
+  }, []);
+
+  const handleCloseHistoryModal = useCallback(() => {
+    setSelectedHistoryEntry(null);
+  }, []);
+
+  const toggleHistorySection = useCallback(() => {
+    setIsHistoryExpanded((prev) => !prev);
+  }, []);
 
   return (
     <div className="app min-h-screen flex flex-col pt-[60px] px-8 pb-8">
@@ -318,7 +345,50 @@ function App() {
             </div>
           </section>
         )}
+
+        {/* Recent Transcriptions Section - Collapsible */}
+        <section className="mt-6">
+          <button
+            onClick={toggleHistorySection}
+            className="w-full flex items-center justify-between px-6 py-4 bg-dark-900 rounded-xl hover:bg-dark-800 transition-colors"
+          >
+            <h2 className="text-xl font-semibold text-white">Recent Transcriptions</h2>
+            <svg
+              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                isHistoryExpanded ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {isHistoryExpanded && (
+            <div className="mt-2">
+              <TranscriptionHistoryList
+                onCopy={handleCopyHistoryItem}
+                onViewFull={handleViewHistoryItem}
+              />
+            </div>
+          )}
+        </section>
       </main>
+
+      {/* History Detail Modal */}
+      {selectedHistoryEntry && (
+        <TranscriptionDetailModal
+          entry={selectedHistoryEntry}
+          onCopy={handleCopyHistoryItem}
+          onClose={handleCloseHistoryModal}
+        />
+      )}
     </div>
   );
 }
