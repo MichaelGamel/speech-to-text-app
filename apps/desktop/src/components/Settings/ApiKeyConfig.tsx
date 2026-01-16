@@ -165,7 +165,7 @@ export const ApiKeyConfig = () => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 focus-visible:ring-blue-500"
             >
               {isSaving ? "Saving..." : "Save API Key"}
             </button>
