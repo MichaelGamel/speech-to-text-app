@@ -99,10 +99,10 @@ export const HotkeyConfig = () => {
           tabIndex={0}
           onKeyDown={handleKeyDown}
           onClick={handleRecordHotkey}
-          className={`flex-1 px-4 py-3 rounded-lg border-2 cursor-pointer transition-colors ${
+          className={`flex-1 px-4 py-3 rounded-lg border-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950 ${
             isRecording
-              ? "border-primary bg-primary/10 animate-pulse"
-              : "border-dark-700 bg-dark-800 hover:border-dark-600"
+              ? "border-primary bg-primary/10 animate-pulse focus-visible:ring-blue-500"
+              : "border-dark-700 bg-dark-800 hover:border-dark-600 focus-visible:ring-gray-400"
           }`}
         >
           {isRecording ? (
