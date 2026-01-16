@@ -3,6 +3,7 @@ import type {
   PermissionState,
   PermissionStatus as PermissionStatusType,
 } from "../../types/electron";
+import { StatusIndicator, type StatusType } from "../StatusIndicator";
 
 export const PermissionStatus = () => {
   const [permissions, setPermissions] = useState<PermissionState>({
@@ -27,16 +28,21 @@ export const PermissionStatus = () => {
     }
   };
 
-  const getStatusColor = (status: PermissionStatusType): string => {
+  /**
+   * Map permission status to StatusIndicator status type.
+   * This provides color-blind friendly icons alongside colors.
+   */
+  const mapPermissionToStatus = (status: PermissionStatusType): StatusType => {
     switch (status) {
       case "granted":
-        return "bg-green-500";
+        return "granted"; // Checkmark icon
       case "denied":
+        return "denied"; // X icon
       case "restricted":
-        return "bg-red-500";
+        return "restricted"; // X icon
       case "not-determined":
       default:
-        return "bg-yellow-500";
+        return "not-determined"; // Clock icon
     }
   };
 
@@ -97,7 +103,10 @@ export const PermissionStatus = () => {
         <div className="flex items-center justify-between p-4 bg-dark-800 rounded-lg">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div className={`w-2 h-2 rounded-full ${getStatusColor(permissions.microphone)}`} />
+              <StatusIndicator
+                status={mapPermissionToStatus(permissions.microphone)}
+                size="sm"
+              />
               <div>
                 <p className="font-medium">Microphone Access</p>
                 <p className="text-sm text-gray-400">Required for audio recording</p>
@@ -121,8 +130,9 @@ export const PermissionStatus = () => {
         <div className="flex items-center justify-between p-4 bg-dark-800 rounded-lg">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div
-                className={`w-2 h-2 rounded-full ${getStatusColor(permissions.accessibility)}`}
+              <StatusIndicator
+                status={mapPermissionToStatus(permissions.accessibility)}
+                size="sm"
               />
               <div>
                 <p className="font-medium">Accessibility Access</p>
