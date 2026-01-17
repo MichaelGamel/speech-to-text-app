@@ -505,6 +505,7 @@ ipcMain.handle("save-global-settings", async (_event, settings: Partial<GlobalSe
 
     return { success: true };
   } catch (error) {
+    console.error("Failed to save global settings:", error);
     return { success: false, error: (error as Error).message };
   }
 });
@@ -513,65 +514,50 @@ ipcMain.handle("save-global-settings", async (_event, settings: Partial<GlobalSe
 // Transcription History (Phase 2)
 // ========================================
 
-ipcMain.handle("get-transcription-history", async () => {
+ipcMain.handle("get-history", async () => {
   try {
     const historyStore = getHistoryStore();
     return historyStore.getAll();
   } catch (error) {
-    console.error("Failed to get transcription history:", error);
+    console.error("Failed to get history:", error);
     return [];
   }
 });
 
-ipcMain.handle("add-to-history", async (_event, entry: Omit<TranscriptionEntry, "id" | "createdAt">) => {
+ipcMain.handle("add-history-entry", async (_event, entry: Omit<TranscriptionEntry, "id" | "timestamp">) => {
   try {
-    if (typeof entry !== "object" || entry === null) {
-      throw new Error("Invalid history entry");
+    if (!entry.text || typeof entry.text !== "string") {
+      throw new Error("Invalid entry text");
     }
 
     const historyStore = getHistoryStore();
-    const newEntry = historyStore.add(entry);
+    const newEntry: TranscriptionEntry = {
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
+      text: entry.text,
+      duration: entry.duration || 0,
+      model: entry.model || "whisper",
+    };
 
+    historyStore.add(newEntry);
     return { success: true, entry: newEntry };
   } catch (error) {
-    return { success: false, error: (error as Error).message };
-  }
-});
-
-ipcMain.handle("update-history-entry", async (_event, id: string, updates: Partial<TranscriptionEntry>) => {
-  try {
-    if (typeof id !== "string" || id.length === 0) {
-      throw new Error("Invalid entry ID");
-    }
-
-    if (typeof updates !== "object" || updates === null) {
-      throw new Error("Invalid updates object");
-    }
-
-    const historyStore = getHistoryStore();
-    const updatedEntry = historyStore.update(id, updates);
-
-    if (!updatedEntry) {
-      return { success: false, error: "Entry not found" };
-    }
-
-    return { success: true, entry: updatedEntry };
-  } catch (error) {
+    console.error("Failed to add history entry:", error);
     return { success: false, error: (error as Error).message };
   }
 });
 
 ipcMain.handle("delete-history-entry", async (_event, id: string) => {
   try {
-    if (typeof id !== "string" || id.length === 0) {
+    if (!id || typeof id !== "string") {
       throw new Error("Invalid entry ID");
     }
 
     const historyStore = getHistoryStore();
     historyStore.delete(id);
-
     return { success: true };
   } catch (error) {
+    console.error("Failed to delete history entry:", error);
     return { success: false, error: (error as Error).message };
   }
 });
@@ -580,55 +566,28 @@ ipcMain.handle("clear-history", async () => {
   try {
     const historyStore = getHistoryStore();
     historyStore.clear();
-
     return { success: true };
   } catch (error) {
-    return { success: false, error: (error as Error).message };
-  }
-});
-
-ipcMain.handle("search-history", async (_event, query: string) => {
-  try {
-    if (typeof query !== "string") {
-      throw new Error("Invalid search query");
-    }
-
-    const historyStore = getHistoryStore();
-    const results = historyStore.search(query);
-
-    return { success: true, results };
-  } catch (error) {
+    console.error("Failed to clear history:", error);
     return { success: false, error: (error as Error).message };
   }
 });
 
 // ========================================
-// App Initialization
+// App Lifecycle
 // ========================================
 
-app.on("ready", async () => {
-  try {
-    // Initialize Whisper model
-    console.log("Initializing Whisper model...");
-    await initializeWhisper((progress) => {
-      console.log("Whisper initialization progress:", progress);
-    });
-
-    // Create main window
-    await createWindow();
-  } catch (error) {
-    console.error("Failed to initialize app:", error);
-    app.quit();
-  }
-});
+app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
+  // On macOS, applications stay active until the user quits explicitly
   if (!isMac) {
     app.quit();
   }
 });
 
 app.on("activate", () => {
+  // On macOS, re-create a window in the app when the dock icon is clicked
   if (mainWindow === null) {
     createWindow();
   }
