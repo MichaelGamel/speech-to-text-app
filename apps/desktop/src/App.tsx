@@ -5,6 +5,7 @@ import { TranscriptionProgress, TranscriptionEntry } from "./types/electron";
 import { GlobalRecordingHandler } from "./components/GlobalRecordingHandler";
 import { TranscriptionHistoryList, TranscriptionDetailModal } from "./components/History";
 import { Toast } from "./components/Toast";
+import { AudioPlayback } from "./components/AudioPlayback";
 
 function App() {
   // Global recording handler (Phase 6 - always active in background)
@@ -29,6 +30,7 @@ function App() {
   const {
     isRecording,
     audioBlob,
+    audioUrl,
     startRecording,
     stopRecording,
     error: recordingError,
@@ -345,6 +347,7 @@ function App() {
                   Audio recorded ({(audioBlob.size / 1024).toFixed(1)} KB). Click "Transcribe" to convert to text.
                 </span>
               </div>
+              <AudioPlayback audioUrl={audioUrl} />
             </div>
           )}
 
@@ -428,46 +431,27 @@ function App() {
           </section>
         )}
 
-        {/* Recent Transcriptions Section - Collapsible */}
-        <section className="mt-6">
-          <button
-            onClick={toggleHistorySection}
-            className="w-full flex items-center justify-between p-4 bg-dark-900 rounded-xl hover:bg-dark-800 transition-colors"
-          >
-            <h2 className="text-2xl font-semibold">Recent Transcriptions</h2>
-            <span className={`text-xl transition-transform duration-300 ${isHistoryExpanded ? "rotate-180" : ""}`}>
-              ▼
-            </span>
-          </button>
+        <TranscriptionHistoryList
+          key={historyRefreshKey}
+          isExpanded={isHistoryExpanded}
+          onToggle={toggleHistorySection}
+          onCopyItem={handleCopyHistoryItem}
+          onViewItem={handleViewHistoryItem}
+        />
 
-          {isHistoryExpanded && (
-            <div className="mt-4 bg-dark-900 rounded-xl p-6">
-              <TranscriptionHistoryList
-                key={historyRefreshKey}
-                onCopy={handleCopyHistoryItem}
-                onView={handleViewHistoryItem}
-              />
-            </div>
-          )}
-        </section>
-
-        {/* History Detail Modal */}
         {selectedHistoryEntry && (
           <TranscriptionDetailModal
             entry={selectedHistoryEntry}
             onClose={handleCloseHistoryModal}
-            onCopy={handleCopyHistoryItem}
-          />
-        )}
-
-        {/* Toast Notification */}
-        {toastVisible && (
-          <Toast
-            message={toastMessage}
-            onClose={hideToast}
           />
         )}
       </main>
+
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        onClose={hideToast}
+      />
     </div>
   );
 }

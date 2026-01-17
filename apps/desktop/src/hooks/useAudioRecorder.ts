@@ -22,6 +22,13 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     try {
       setError(null);
 
+      // Revoke previous blob URL to prevent memory leaks
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+        setAudioUrl(null);
+        setAudioBlob(null);
+      }
+
       // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
