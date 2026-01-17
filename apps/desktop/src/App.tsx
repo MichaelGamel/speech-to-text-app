@@ -432,16 +432,16 @@ function App() {
         <section className="mt-6">
           <button
             onClick={toggleHistorySection}
-            className="w-full flex items-center justify-between px-6 py-4 bg-dark-900 rounded-t-xl hover:bg-dark-800 transition-colors"
+            className="w-full flex items-center justify-between px-6 py-4 bg-dark-900 rounded-xl hover:bg-dark-800 transition-colors"
           >
             <h2 className="text-2xl font-semibold">Recent Transcriptions</h2>
-            <span className={`text-2xl transition-transform ${isHistoryExpanded ? "rotate-180" : ""}`}>
+            <span className={`text-2xl transition-transform duration-200 ${isHistoryExpanded ? "rotate-180" : ""}`}>
               ▼
             </span>
           </button>
 
           {isHistoryExpanded && (
-            <div className="bg-dark-900 rounded-b-xl p-6 border-t border-dark-800">
+            <div className="mt-4">
               <TranscriptionHistoryList
                 key={historyRefreshKey}
                 onCopy={handleCopyHistoryItem}
@@ -450,23 +450,24 @@ function App() {
             </div>
           )}
         </section>
+
+        {/* Toast Notification */}
+        {toastVisible && (
+          <Toast
+            message={toastMessage}
+            onClose={hideToast}
+          />
+        )}
+
+        {/* History Detail Modal */}
+        {selectedHistoryEntry && (
+          <TranscriptionDetailModal
+            entry={selectedHistoryEntry}
+            onClose={handleCloseHistoryModal}
+            onCopy={handleCopyHistoryItem}
+          />
+        )}
       </main>
-
-      {/* History Detail Modal */}
-      {selectedHistoryEntry && (
-        <TranscriptionDetailModal
-          entry={selectedHistoryEntry}
-          onClose={handleCloseHistoryModal}
-          onCopy={() => handleCopyHistoryItem(selectedHistoryEntry)}
-        />
-      )}
-
-      {/* Toast Notification */}
-      <Toast
-        message={toastMessage}
-        visible={toastVisible}
-        onHide={hideToast}
-      />
     </div>
   );
 }

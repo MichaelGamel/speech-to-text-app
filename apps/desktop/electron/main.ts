@@ -505,540 +505,131 @@ ipcMain.handle("save-global-settings", async (_event, settings: Partial<GlobalSe
 
     return { success: true };
   } catch (error) {
-    console.error("Failed to save global settings:", error);
     return { success: false, error: (error as Error).message };
   }
 });
 
-ipcMain.handle("save-api-key", async (_event, apiKey: string) => {
-  try {
-    if (typeof apiKey !== "string") {
-      throw new Error("Invalid API key");
-    }
-
-    const settingsStore = getSettingsStore();
-    const success = settingsStore.setApiKey(apiKey);
-
-    return { success };
-  } catch (error) {
-    console.error("Failed to save API key:", error);
-    return { success: false, error: (error as Error).message };
-  }
-});
-
-ipcMain.handle("has-api-key", async () => {
-  try {
-    const settingsStore = getSettingsStore();
-    return settingsStore.hasApiKey();
-  } catch (error) {
-    return false;
-  }
-});
-
-ipcMain.handle("clear-api-key", async () => {
-  try {
-    const settingsStore = getSettingsStore();
-    settingsStore.clearApiKey();
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to clear API key:", error);
-    return { success: false };
-  }
-});
-
 // ========================================
-// Permissions (Phase 1)
-// ========================================
-
-ipcMain.handle("get-all-permissions", async () => {
-  try {
-    const permissionManager = getPermissionManager();
-    return permissionManager.getAllPermissions();
-  } catch (error) {
-    console.error("Failed to get permissions:", error);
-    return {
-      microphone: "not-determined",
-      accessibility: "not-determined",
-    };
-  }
-});
-
-ipcMain.handle("check-accessibility-permission", async () => {
-  try {
-    const permissionManager = getPermissionManager();
-    const status = permissionManager.checkAccessibilityPermission();
-    return { status };
-  } catch (error) {
-    console.error("Failed to check accessibility permission:", error);
-    return { status: "not-determined" };
-  }
-});
-
-ipcMain.handle("request-accessibility-permission", async () => {
-  try {
-    const permissionManager = getPermissionManager();
-    const granted = permissionManager.requestAccessibilityPermission();
-    return { granted };
-  } catch (error) {
-    console.error("Failed to request accessibility permission:", error);
-    return { granted: false };
-  }
-});
-
-ipcMain.handle("open-accessibility-preferences", async () => {
-  try {
-    const permissionManager = getPermissionManager();
-    await permissionManager.openAccessibilityPreferences();
-  } catch (error) {
-    console.error("Failed to open accessibility preferences:", error);
-  }
-});
-
-ipcMain.handle("open-microphone-preferences", async () => {
-  try {
-    const permissionManager = getPermissionManager();
-    await permissionManager.openMicrophonePreferences();
-  } catch (error) {
-    console.error("Failed to open microphone preferences:", error);
-  }
-});
-
-// ========================================
-// Global Hotkeys (Phase 3)
-// ========================================
-
-ipcMain.handle("register-global-hotkey", async (_event, accelerator: string) => {
-  try {
-    if (typeof accelerator !== "string" || accelerator.trim().length === 0) {
-      throw new Error("Invalid accelerator");
-    }
-
-    if (!mainWindow) {
-      throw new Error("Main window not available");
-    }
-
-    // Check accessibility permission before registering hotkey (required on macOS)
-    const permissionManager = getPermissionManager();
-    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
-
-    if (accessibilityStatus !== "granted") {
-      console.warn(
-        "Cannot register global hotkey: accessibility permission not granted. " +
-        "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
-      );
-      // Notify renderer that hotkey registration failed due to missing permissions
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send("hotkey-permission-required", {
-          permission: "accessibility",
-          reason: "Global hotkeys require accessibility permission on macOS",
-        });
-      }
-      return {
-        success: false,
-        error: "Accessibility permission not granted. Please enable it in System Preferences.",
-      };
-    }
-
-    const hotkeyService = getGlobalHotkeyService(mainWindow);
-    const success = hotkeyService.register(accelerator);
-
-    if (success) {
-      // Save to settings
-      const settingsStore = getSettingsStore();
-      settingsStore.set("hotkey", accelerator);
-    }
-
-    return { success };
-  } catch (error) {
-    console.error("Failed to register global hotkey:", error);
-    return { success: false, error: (error as Error).message };
-  }
-});
-
-ipcMain.handle("unregister-global-hotkey", async () => {
-  try {
-    const hotkeyService = getGlobalHotkeyService();
-    hotkeyService.unregister();
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to unregister global hotkey:", error);
-    return { success: false };
-  }
-});
-
-ipcMain.handle("get-current-hotkey", async () => {
-  try {
-    const hotkeyService = getGlobalHotkeyService();
-    return hotkeyService.getCurrentHotkey();
-  } catch (error) {
-    return null;
-  }
-});
-
-ipcMain.handle("is-hotkey-registered", async () => {
-  try {
-    const hotkeyService = getGlobalHotkeyService();
-    return hotkeyService.isRegistered();
-  } catch (error) {
-    return false;
-  }
-});
-
-// ========================================
-// Text Injection (Phase 4)
-// ========================================
-
-ipcMain.handle("inject-text", async (_event, text: string, preserveClipboard = true) => {
-  try {
-    if (typeof text !== "string" || text.trim().length === 0) {
-      throw new Error("Invalid text");
-    }
-
-    const textInjectionService = getTextInjectionService();
-
-    // Check if text injection is available on this platform
-    if (!textInjectionService.isAvailable()) {
-      // Fallback: just copy to clipboard
-      await textInjectionService.copyToClipboard(text);
-      return {
-        success: true,
-        error: textInjectionService.getUnsupportedMessage(),
-      };
-    }
-
-    // Inject the text
-    await textInjectionService.injectText(text, preserveClipboard);
-
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to inject text:", error);
-    return { success: false, error: (error as Error).message };
-  }
-});
-
-ipcMain.handle("copy-to-clipboard", async (_event, text: string) => {
-  try {
-    if (typeof text !== "string" || text.trim().length === 0) {
-      throw new Error("Invalid text");
-    }
-
-    const textInjectionService = getTextInjectionService();
-    await textInjectionService.copyToClipboard(text);
-
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to copy to clipboard:", error);
-    return { success: false, error: (error as Error).message };
-  }
-});
-
-ipcMain.handle("is-text-injection-available", async () => {
-  try {
-    const textInjectionService = getTextInjectionService();
-    return textInjectionService.isAvailable();
-  } catch (error) {
-    return false;
-  }
-});
-
-// ========================================
-// Streaming Transcription (Phase 5)
-// ========================================
-
-ipcMain.handle("start-streaming-transcription", async (_event, apiKey?: string) => {
-  try {
-    if (!mainWindow) {
-      throw new Error("Main window not available");
-    }
-
-    // Create streaming service if not exists
-    if (!streamingService) {
-      streamingService = new StreamingSTTService(mainWindow);
-    }
-
-    // Get API key from settings if not provided
-    let finalApiKey = apiKey;
-    if (!finalApiKey) {
-      const settingsStore = getSettingsStore();
-      finalApiKey = settingsStore.getApiKey() || undefined;
-    }
-
-    // Start streaming
-    const result = await streamingService.start(finalApiKey);
-
-    return result;
-  } catch (error) {
-    console.error("Failed to start streaming transcription:", error);
-    return { success: false, mode: "whisper" as const, error: (error as Error).message };
-  }
-});
-
-ipcMain.handle("stop-streaming-transcription", async () => {
-  try {
-    if (!streamingService) {
-      return { transcript: "" };
-    }
-
-    const transcript = await streamingService.stop();
-    return { transcript };
-  } catch (error) {
-    console.error("Failed to stop streaming transcription:", error);
-    return { transcript: "" };
-  }
-});
-
-ipcMain.handle("send-audio-chunk", async (_event, audioData: ArrayBuffer) => {
-  try {
-    if (!streamingService) {
-      throw new Error("Streaming service not started");
-    }
-
-    // Convert ArrayBuffer to Float32Array
-    const float32Data = new Float32Array(audioData);
-    streamingService.sendAudio(float32Data);
-  } catch (error) {
-    console.error("Failed to send audio chunk:", error);
-  }
-});
-
-// ========================================
-// Transcription History (Phase 8)
+// Transcription History (Phase 2)
 // ========================================
 
 ipcMain.handle("get-transcription-history", async () => {
   try {
     const historyStore = getHistoryStore();
-    const entries = historyStore.getAll();
-    return { success: true, data: entries };
+    return historyStore.getAll();
   } catch (error) {
     console.error("Failed to get transcription history:", error);
-    return { success: false, error: (error as Error).message };
+    return [];
   }
 });
 
-ipcMain.handle("add-transcription-history", async (_event, entry: Omit<TranscriptionEntry, "id" | "timestamp" | "characterCount">) => {
+ipcMain.handle("add-to-history", async (_event, entry: Omit<TranscriptionEntry, "id" | "createdAt">) => {
   try {
     if (typeof entry !== "object" || entry === null) {
-      throw new Error("Invalid entry object");
-    }
-
-    if (typeof entry.text !== "string" || entry.text.trim().length === 0) {
-      throw new Error("Invalid text");
-    }
-
-    if (typeof entry.duration !== "number" || entry.duration < 0) {
-      throw new Error("Invalid duration");
-    }
-
-    if (entry.source !== "recording" && entry.source !== "hotkey") {
-      throw new Error("Invalid source");
+      throw new Error("Invalid history entry");
     }
 
     const historyStore = getHistoryStore();
     const newEntry = historyStore.add(entry);
-    return { success: true, data: newEntry };
+
+    return { success: true, entry: newEntry };
   } catch (error) {
-    console.error("Failed to add transcription history:", error);
     return { success: false, error: (error as Error).message };
   }
 });
 
-ipcMain.handle("delete-transcription-history", async (_event, id: string) => {
+ipcMain.handle("update-history-entry", async (_event, id: string, updates: Partial<TranscriptionEntry>) => {
   try {
-    if (typeof id !== "string" || id.trim().length === 0) {
-      throw new Error("Invalid id");
+    if (typeof id !== "string" || id.length === 0) {
+      throw new Error("Invalid entry ID");
+    }
+
+    if (typeof updates !== "object" || updates === null) {
+      throw new Error("Invalid updates object");
     }
 
     const historyStore = getHistoryStore();
-    const deleted = historyStore.delete(id);
+    const updatedEntry = historyStore.update(id, updates);
 
-    if (!deleted) {
+    if (!updatedEntry) {
       return { success: false, error: "Entry not found" };
     }
 
-    return { success: true };
+    return { success: true, entry: updatedEntry };
   } catch (error) {
-    console.error("Failed to delete transcription history:", error);
     return { success: false, error: (error as Error).message };
   }
 });
 
-ipcMain.handle("clear-transcription-history", async () => {
+ipcMain.handle("delete-history-entry", async (_event, id: string) => {
+  try {
+    if (typeof id !== "string" || id.length === 0) {
+      throw new Error("Invalid entry ID");
+    }
+
+    const historyStore = getHistoryStore();
+    historyStore.delete(id);
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
+  }
+});
+
+ipcMain.handle("clear-history", async () => {
   try {
     const historyStore = getHistoryStore();
     historyStore.clear();
+
     return { success: true };
   } catch (error) {
-    console.error("Failed to clear transcription history:", error);
+    return { success: false, error: (error as Error).message };
+  }
+});
+
+ipcMain.handle("search-history", async (_event, query: string) => {
+  try {
+    if (typeof query !== "string") {
+      throw new Error("Invalid search query");
+    }
+
+    const historyStore = getHistoryStore();
+    const results = historyStore.search(query);
+
+    return { success: true, results };
+  } catch (error) {
     return { success: false, error: (error as Error).message };
   }
 });
 
 // ========================================
-// Application Lifecycle
+// App Initialization
 // ========================================
 
-app.whenReady().then(async () => {
-  // Request microphone permission on macOS
-  const micPermission = await requestMicrophonePermission();
-  if (!micPermission && isMac) {
-    console.warn("Microphone permission not granted. Speech recognition may not work.");
-  }
-
-  // Request accessibility permission on macOS (required for global hotkeys and text injection)
-  if (isMac) {
-    const permissionManager = getPermissionManager();
-    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
-
-    if (accessibilityStatus !== "granted") {
-      // Request accessibility permission - this will show a system prompt
-      const accessibilityGranted = permissionManager.requestAccessibilityPermission();
-      if (!accessibilityGranted) {
-        console.warn("Accessibility permission not granted. Global hotkeys and text injection may not work.");
-      }
-    }
-  }
-
-  // Configure session for Web Speech API
-  const ses = session.defaultSession;
-
-  // Set Content Security Policy at session level
-  ses.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Content-Security-Policy': [
-          "default-src 'self'; " +
-          "script-src 'self' 'unsafe-inline'; " +
-          "style-src 'self' 'unsafe-inline'; " +
-          "connect-src 'self' https://www.google.com https://*.googleapis.com wss://*.google.com; " +
-          "media-src 'self' blob: mediastream:"
-        ]
-      }
+app.on("ready", async () => {
+  try {
+    // Initialize Whisper model
+    console.log("Initializing Whisper model...");
+    await initializeWhisper((progress) => {
+      console.log("Whisper initialization progress:", progress);
     });
-  });
 
-  // Handle permission requests for media devices
-  ses.setPermissionRequestHandler((webContents, permission, callback) => {
-    const allowedPermissions = ['media', 'mediaKeySystem', 'geolocation', 'notifications', 'midi', 'midiSysex', 'pointerLock', 'fullscreen'];
-
-    if (allowedPermissions.includes(permission)) {
-      callback(true); // Allow
-    } else {
-      callback(false); // Deny
-    }
-  });
-
-  createWindow();
-
-  // Create overlay window (Phase 2)
-  overlayWindow = createOverlayWindow();
-
-  // Position overlay based on settings
-  const settingsStore = getSettingsStore();
-  const settings = settingsStore.getAll();
-  positionOverlay(settings.overlayPosition);
-
-  // Initialize global hotkey service (Phase 3)
-  if (mainWindow) {
-    const hotkeyService = getGlobalHotkeyService(mainWindow);
-
-    // Check accessibility permission before registering hotkey (required on macOS)
-    const permissionManager = getPermissionManager();
-    const accessibilityStatus = permissionManager.checkAccessibilityPermission();
-
-    if (accessibilityStatus !== "granted") {
-      console.warn(
-        "Skipping global hotkey registration: accessibility permission not granted. " +
-        "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
-      );
-      // Notify renderer that hotkey registration failed due to missing permissions
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send("hotkey-permission-required", {
-          permission: "accessibility",
-          reason: "Global hotkeys require accessibility permission on macOS",
-        });
-      }
-    } else {
-      const success = hotkeyService.register(settings.hotkey);
-      if (!success) {
-        console.warn("Failed to register default hotkey:", settings.hotkey);
-      }
-    }
-
-    // Initialize streaming service (Phase 6)
-    streamingService = new StreamingSTTService(mainWindow);
+    // Create main window
+    await createWindow();
+  } catch (error) {
+    console.error("Failed to initialize app:", error);
+    app.quit();
   }
-
-  // Handle overlay transcript updates from renderer (Phase 6)
-  ipcMain.on("update-overlay-transcript", (_event, text: string) => {
-    try {
-      const hotkeyService = getGlobalHotkeyService();
-      hotkeyService.updateTranscriptPreview(text);
-    } catch (error) {
-      console.error("Failed to update overlay transcript:", error);
-    }
-  });
-
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-    // Recreate overlay if it was destroyed
-    if (!overlayWindow || overlayWindow.isDestroyed()) {
-      overlayWindow = createOverlayWindow();
-      positionOverlay(settings.overlayPosition);
-    }
-  });
 });
 
-// macOS: Keep app running when all windows closed (standard macOS behavior)
-// Windows/Linux: Quit when all windows closed
 app.on("window-all-closed", () => {
   if (!isMac) {
     app.quit();
   }
 });
 
-// Graceful shutdown
-let isQuitting = false;
-
-app.on("before-quit", async (event) => {
-  if (!isQuitting) {
-    event.preventDefault();
-    isQuitting = true;
-
-    // Cleanup tasks
-    try {
-      // Stop any active recording
-      if (isRecording) {
-        isRecording = false;
-        recordingStartTime = null;
-      }
-
-      // Save window state one final time
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        await saveWindowState(mainWindow);
-      }
-
-      // Destroy overlay window
-      destroyOverlay();
-
-      // Cleanup global hotkey service
-      destroyGlobalHotkeyService();
-
-      // TODO: Add other cleanup tasks here
-      // - Close database connections
-      // - Clean up temporary files
-      // - Cancel pending operations
-    } catch (error) {
-      console.error("Error during cleanup:", error);
-    }
-
-    // Close all windows
-    BrowserWindow.getAllWindows().forEach((window) => window.close());
-
-    // Finally quit
-    app.quit();
+app.on("activate", () => {
+  if (mainWindow === null) {
+    createWindow();
   }
 });
